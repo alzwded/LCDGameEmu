@@ -20,6 +20,7 @@ int yylex();
 %token <str> END ".end"
 for chars like '&' just return the char
 */
+%token <num> REG
 %token <str> PATH IDENT
 %token <num> INT
 /*PATH : *
@@ -50,7 +51,8 @@ statement : set_statement
 
 nop : ".nop" ;
 
-VAR : '$' INT | '$' IDENT ;
+/* VAR : '$' INT | '$' IDENT ; actually processed in lexer */
+VAR : REG | IDENT ;
 set_statement : ".set" INT | ".reset" INT
               | ".set" VAR arithmetic_expression
               | ".reset" ".all"

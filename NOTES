@@ -19,6 +19,61 @@ game.db:
 <id>
 <on clock actions>
 
+Grammar
+=======
+
+file ::= file | item ;
+item ::= sprite | state ;
+
+sprite ::= ".sprite" INT PATH ;
+state ::= ".state" INT code ;
+
+code ::= codes ".end" ;
+codes ::= codes block | block ;
+block ::= block '&' statement | statement ;
+statement ::= set_statement
+              | conditional_statement
+              | transition_statement
+              ;
+
+PATH ::= *
+IDENT ::= [a-zA-Z_][a-zA-Z_0-9]*
+VAR ::= '$' INT | '$' IDENT ;
+set_statement ::= ".set" INT | ".reset" INT
+                | ".set" VAR arithmetic_expression
+                | ".reset" "all"
+                ;
+transition_statement ::= ".transition" INT ;
+
+isset_expression ::= "set" INT | "reset" INT ;
+
+arithmetic_expression ::= 'mul' operand operand
+                        | 'div' operand operand
+                        | 'mod' operand operand
+                        | 'sum' operand operand
+                        | 'sub' operand operand
+                        | INT
+                        ;
+
+operand ::= VAR | arithmetic_expression ;
+
+equality_expression ::= '=' operand operand
+                      | '!' operand operand
+                      | '<' operand operand
+                      | '>' operand operand
+                      ;
+
+rng_expression ::= '%.' INT ;
+
+atomic_condition ::= isset_expression
+                   | equality_expression
+                   | rng_expression
+                   ;
+
+condition ::= condition '&' atomic_condition | atomic_condition ;
+
+conditional_statement ::= ".if" condition ';' block ".fi" ;
+
 EXAMPLE FILE
 ============
 
@@ -92,32 +147,41 @@ dead.png
 
 .state
 0
-set 1
-if set 117 & = $0 0 ; set $0 1
-if set 117 & = $0 1 ; reset 117 & set 116 & set $0 0
-if set 227 & = $1 0 ; set $1 1
-if set 227 & = $1 1 ; reset 227 & set 226 & set $1 0
-if %.4 ; set 117          // if 40% chance
-if %.4 ; set 227
-if $right ; activate 1 & deactivate 0
-if = $11 3 ; reset 13 & set $11 0
-if = $11 2 ; reset 12 & set 13 & set $11 3
-if = $11 1 ; reset 11 & set 12 & set $11 2
-if = $11 0 & $fire ; set 11 & set $11 1
-if set 11 & set 115 ; reset 115 & reset 11 & set 15
-if set 12 & set 116 ; reset 116 & reset 12 & set 16
-if set 13 & set 117 ; reset 
-if reset 11 & set 115 ; reset all & set 256
+.set 1
+.if set 117 & = $0 0 ; .set $0 1 .fi
+if set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 fi
+if set 227 & = $1 0 ; set $1 1 fi
+if set 227 & = $1 1 ; reset 227 & set 226 & set $1 0 fi 
+if %.4 ; set 117 fi       // if 40% chance
+if %.4 ; set 227 fi
+if $right ; transition 1 fi
+if = $11 3 ; reset 13 & set $11 0 fi
+if = $11 2 ; reset 12 & set 13 & set $11 3 fi
+if = $11 1 ; reset 11 & set 12 & set $11 2 fi
+if = $11 0 & $fire ; set 11 & set $11 1 fi
+if set 11 & set 115 ; reset 115 & reset 11 & set 15 fi
+if set 12 & set 116 ; reset 116 & reset 12 & set 16 fi
+if set 13 & set 117 ; reset 117 & reset 13 & set 17 fi
+if reset 11 & set 115 ; reset all & set $5 0 & transition 5 fi
+.if set 225 ; .reset all & .set $5 0 & .transition 5 .fi
+.end
 
 .state
 1
 reset 1
 set 2
-if 117 & = $0 0 ; set $0 1
-if 117 & = $0 1 ; reset 117 & set 116 & set $0 0
-if 227 & reset $1 ; set $1
-if 227 & set $1 ; reset 227 & set 226 & reset $1
-if %.4 ; set 117          // if 40% chance
-if %.4 ; set 227
-if $left ; transition 0
-if $fire ; transition 21
+if 117 & = $0 0 ; set $0 1 fi
+if 117 & = $0 1 ; reset 117 & set 116 & set $0 0 fi
+if 227 & reset $1 ; set $1 fi
+if 227 & set $1 ; reset 227 & set 226 & reset $1 fi
+if %.4 ; set 117 fi       // if 40% chance
+if %.4 ; set 227 fi
+if $left ; transition 0 fi
+// idem as above logic
+
+.state
+5
+if = mod $5 2 0 ; set 256 fi
+if = mod $5 2 1 ; reset 256 fi
+if = $5 5 ; transition 1 fi
+set $5 + $5 1

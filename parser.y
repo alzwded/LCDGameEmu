@@ -53,17 +53,17 @@ nop : ".nop" ;
 VAR : '$' INT | '$' IDENT ;
 set_statement : ".set" INT | ".reset" INT
               | ".set" VAR arithmetic_expression
-              | ".reset" "all"
+              | ".reset" ".all"
               ;
 transition_statement : ".transition" INT ;
 
-isset_expression : "set" INT | "reset" INT ;
+isset_expression : ".set" INT | ".reset" INT ;
 
-arithmetic_expression : "mul" operand operand
-                      | "div" operand operand
-                      | "mod" operand operand
-                      | "sum" operand operand
-                      | "sub" operand operand
+arithmetic_expression : ".mul" operand operand
+                      | ".div" operand operand
+                      | ".mod" operand operand
+                      | ".sum" operand operand
+                      | ".sub" operand operand
                       | INT
                       ;
 

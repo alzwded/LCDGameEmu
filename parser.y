@@ -4,6 +4,7 @@ Grammar for LCDGameEmu .db file
 */
 %{
 #include <stdio.h>
+#include <assert.h>
 #include "interface.h"
 
 int yylex();
@@ -13,6 +14,12 @@ int yylex();
     int num;
 }
 
+/* optional, alternatively use for(YYNTOKENS) strncmp(yytname[i] + 1, s, strlen(s)) return yytoknum[i]
+%token <str> SPRITE ".sprite"
+%token <str> STATE ".state"
+%token <str> END ".end"
+for chars like '&' just return the char
+*/
 %token <str> PATH IDENT
 %token <num> INT
 /*PATH : *
@@ -81,12 +88,52 @@ conditional_statement : ".if" condition ';' block ".fi" ;
 
 
 %%
+char* yylex_buf = NULL;
+typedef struct node_s {
+    char c;
+    struct node_s* n;
+} node_t;
+typedef node_t* pNode_t;
+pNode_t new_node(char const c)
+{
+    pNode_t ret = (pNode_t)malloc(sizeof(node_t));
+    ret->c = c;
+    ret->n = NULL;
+    return ret;
+}
+void yylex_move(pNode_t n, size_t const size)
+{
+    assert(size);
+    assert(n);
+    if(yylex_buf) free(yylex_buf);
+    yylex_buf = (char*)malloc(size);
+    char* p = yylex_buf;
+    while(n) {
+        *p = n->c;
+        pNode_t toDelete = n;
+        n = n->n;
+        free(toDelete);
+        ++p;
+    }
+    *p = NULL;
+}
 
 int yylex()
 {
-    // TODO
     // I've decided not to use flex
-    return EOF;
+    // TODO
+    char c;
+    size_t size;
+    // read char
+    // process
+    // n->n = new_node(c);
+    // size++;
+    // loop
+    // 
+    // yylex_move(n, size)
+    // yylval.str = yylex_buf;
+    // return STRING?
+    return STRING;
 }
 
 int yyerror(char* s)

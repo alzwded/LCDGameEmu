@@ -5,6 +5,8 @@ Grammar for LCDGameEmu .db file
 %{
 #include <stdio.h>
 #include "interface.h"
+
+int yylex();
 %}
 %union {
     char const* str;
@@ -79,6 +81,13 @@ conditional_statement : ".if" condition ';' block ".fi" ;
 
 
 %%
+
+int yylex()
+{
+    // TODO
+    // I've decided not to use flex
+    return EOF;
+}
 
 int yyerror(char* s)
 {

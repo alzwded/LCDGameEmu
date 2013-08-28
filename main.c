@@ -31,7 +31,7 @@ int load(char const* fileName)
 
 void test()
 {
-    load("example/test-game.db");
+    load("example/test-game.lge");
 }
 
 int main(int argc, char* argv[])

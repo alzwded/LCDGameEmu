@@ -1,3 +1,7 @@
+:Errata:
+in my 5e53b45..083e39c commit I meant the LEXER is finished, not the parser. Just wanted to get that out of the way.
+
+:BEGIN FILE:
 storage format:
     game.db                 sprite descriptor and sprite graph
     game.assets/bg.png      background

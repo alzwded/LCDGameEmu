@@ -3,7 +3,7 @@ in my 5e53b45..083e39c commit I meant the LEXER is finished, not the parser. Jus
 
 :BEGIN FILE:
 storage format:
-    game.db                 sprite descriptor and sprite graph
+    game.lge                sprite descriptor and sprite graph (lgescript)
     game.assets/bg.png      background
     game.assets/*.png       sprites
 
@@ -13,7 +13,7 @@ general:
 bg.png:
     400x400 pixels
 
-game.db:
+game.lge:
 .sprite
 <id>
 <image name>
@@ -25,6 +25,10 @@ game.db:
 
 Grammar
 =======
+
+The language is called LGEScript. It's a hybrid declarative/iterative/state-machiney scripting language. Wrap your head around THAT!
+
+c.f. with parser.y the grammar section.
 
 file ::= file | item ;
 item ::= sprite | state ;

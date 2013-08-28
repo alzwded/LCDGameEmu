@@ -1,8 +1,21 @@
 YACC = bison
 YACCOPTS = --graph -k -v
+MAINOBJ = main.o
+EXE = lcdgameemu
+OBJS = parser.o interfaces_impl.o
+CC = gcc
+COPTS = -g -c -I.
+LD = gcc
+LDOPTS = 
 
-parser.c parser.h: parser.y
-	bison  -o parser.c  $(YACCOPTS) -- parser.y
+$(EXE): $(MAINOBJ) $(OBJS)
+	$(LD) $(LDOPTS) -o $(EXE) $(MAINOBJ) $(OBJS)
+
+%.o: %.c
+	$(CC) $(COPTS) -o $@ $<
+
+parser.c: parser.y
+	$(YACC)  -o parser.c  $(YACCOPTS) -- parser.y
 
 clean:
-	rm -f parser.dot parser.output parser.c
+	rm -f parser.dot parser.output parser.c *.o $(EXE)

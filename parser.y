@@ -5,7 +5,7 @@ Grammar for LCDGameEmu .db file
 %{
 #include <stdio.h>
 #include <assert.h>
-#include "interface.h"
+#include "interfaces.h"
 
 int yylex();
 %}
@@ -117,7 +117,7 @@ void yylex_move(pNode_t n, size_t const size)
         free(toDelete);
         ++p;
     }
-    *p = NULL;
+    *p = '\0';
 }
 
 int yylex()
@@ -135,7 +135,8 @@ int yylex()
     // yylex_move(n, size)
     // yylval.str = yylex_buf;
     // return STRING?
-    return STRING;
+    //return STRING;
+    return INT;
 }
 
 int yyerror(char* s)

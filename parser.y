@@ -48,7 +48,7 @@ item : sprite | state ;
 sprite : ".sprite" INT PATH ;
 state : ".state" INT code ;
 
-code : codes ".end" ;
+code : codes ".end" | ".end" ;
 codes : codes block | block ;
 block : block '&' statement | statement ;
 statement : set_statement

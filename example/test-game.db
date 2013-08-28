@@ -114,5 +114,9 @@
 .if = .mod $5 2 0 ; .set 256 .fi
 .if = .mod $5 2 1 ; .reset 256 .fi
 .if = $5 5 ; .transition 1 .fi
-.set $5 + $5 1
+.set $5 + $5 1 & .nop
+.end
+
+.state
+127
 .end

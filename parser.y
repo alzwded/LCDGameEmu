@@ -6,7 +6,11 @@ Grammar for LCDGameEmu .db file
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <ctype.h>
 #include "interfaces.h"
+
+#define YYDEBUG 1
+#define YYPRINT(A,B,C) /* empty */
 
 int yylex();
 %}
@@ -21,9 +25,11 @@ int yylex();
 %token <str> END ".end"
 for chars like '&' just return the char
 */
+%token BAD_TOKEN
 %token <num> REG
 %token <str> PATH IDENT
 %token <num> INT
+%token RNDM "%."
 /*PATH : *
 IDENT : [a-zA-Z_][a-zA-Z_0-9]*
 VAR : '$' INT | '$' IDENT ;*/
@@ -36,7 +42,7 @@ VAR : '$' INT | '$' IDENT ;*/
 
 %%
 
-file : file item | item ;
+file : file item | /*item*/ ;
 item : sprite | state ;
 
 sprite : ".sprite" INT PATH ;
@@ -61,13 +67,18 @@ set_statement : ".set" INT | ".reset" INT
               ;
 transition_statement : ".transition" INT ;
 
-isset_expression : ".set" INT | ".reset" INT ;
+isset_expression : ".set" INT | ".reset" INT
+                 | ".set" IDENT | ".reset" IDENT ;
 
 arithmetic_expression : ".mul" operand operand
                       | ".div" operand operand
                       | ".mod" operand operand
                       | ".sum" operand operand
                       | ".sub" operand operand
+                      | '*' operand operand
+                      | '/' operand operand
+                      | '+' operand operand
+                      | '-' operand operand
                       | INT
                       ;
 
@@ -132,7 +143,8 @@ int yylex()
         lsVARREG,
         lsKEYWORD,
         lsNUMBER,
-        lsCOMMENT
+        lsCOMMENT,
+        lsPATH
     } lexer_state_t;
 
     lexer_state_t state = lsFIRST, prevState = lsFIRST;
@@ -147,12 +159,16 @@ int yylex()
 
     do {
         if(feof(parser_get_stream())) {
-            return 0; // end
+            if(state == lsFIRST) return 0;
+            else break;
         }
         i = fgetc(parser_get_stream());
         if(i == EOF) if(state == lsFIRST) return 0; else break;
 
         c = (char)i;
+#ifdef PERSONAL_TRACE
+        printf("read %c %x\n", c, c);
+#endif
 
         if(state == lsCOMMENT) {
             if(c == '\n') {
@@ -162,12 +178,36 @@ int yylex()
         }
 
 
-        if(c == ';') {
+        if(c == '#') {
             prevState = state;
             state = lsCOMMENT;
+            continue;
         }
 
-        if(isblank(c)) if(state == lsFIRST) continue; else break;
+        if(state == lsFIRST) {
+            switch(c) {
+            case '&':
+            case ';':
+            case '=':
+            case '<':
+            case '>':
+            case '!':
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+                return c;
+            case '%':
+                if(feof(parser_get_stream())) return BAD_TOKEN;
+                i = fgetc(parser_get_stream());
+                if(i == EOF) return BAD_TOKEN;
+                c = (char)i;
+                if(c != '.') return BAD_TOKEN;
+                else return RNDM;
+            }
+        }
+
+        if(isspace(c)) if(state == lsFIRST) continue; else break;
 
         if(state == lsFIRST && c == '$') {
             state = lsVARREG;
@@ -187,47 +227,66 @@ int yylex()
             assert(!n);
             n = new_node(c);
             pn = n;
+            size = 1;
             continue;
         }
+        if(state == lsFIRST && c == '"') {
+            state = lsPATH;
+            continue;
+        }
+        if(state == lsPATH && c == '"') {
+            break;
+        }
+
         switch(state) {
         case lsNUMBER:
             if(!isdigit(c)) {
                 // error?
-                return -1;
+                return BAD_TOKEN;
             } else {
                 assert(pn);
                 pn = pn->n = new_node(c);
+                ++size;
             }
             break;
         case lsKEYWORD:
             assert(pn);
             pn = pn->n = new_node(c);
+            ++size;
             break;
+        case lsPATH:
         case lsVARREG:
             if(!n) {
                 n = new_node(c);
                 pn = n;
+                size = 1;
             } else {
                 pn = pn->n = new_node(c);
+                ++size;
             }
             break;
         default:
             // error?
-            return -1;
+            return BAD_TOKEN;
         }
     } while(1);
 
     switch(state) {
+    case lsPATH:
+        assert(n);
+        yylex_move(n, size);
+        yylval.str = yylex_buf;
+        return PATH;
     case lsKEYWORD:
         assert(n);
         yylex_move(n, size);
-        for(i = 0; i < YYNTOKENS; ++i) {
-            if(strncmp(yytname[i] + 1, yylex_buf, strlen(yylex_buf))) {
-                return i;
+        for(i = 3; i < YYNTOKENS; ++i) {
+            if(0 == strncmp(yytname[i] + 1, yylex_buf, strlen(yylex_buf))) {
+                return yytoknum[i];
             }
         }
         // error?
-        return -1;
+        return BAD_TOKEN;
     case lsVARREG:
         assert(n);
         yylex_move(n, size);
@@ -250,7 +309,7 @@ int yylex()
         return INT;
     default:
         // error?
-        return -1;
+        return BAD_TOKEN;
     }
 }
 

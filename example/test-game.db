@@ -1,0 +1,118 @@
+# This is an example file.
+# It is meant to showcase the posibility of the LCDGameEmu's as-of-yet
+# unnamed declarative & scripting language
+# If I ever finish this project, this game is not to be taken seriously
+# It is an example, duh
+
+.sprite
+1
+"player_left.png"
+
+.sprite
+2
+"player_right.png"
+
+.sprite
+10
+"player_bullet_left.png"
+.sprite
+11
+"player_bullet_left_2.png"
+
+.sprite
+20
+"player_bullet_right.png"
+.sprite
+21
+"player_bullet_right_2.png"
+
+.sprite
+15
+"player_bullet_left_explode.png"
+.sprite
+16
+"player_bullet_left_2_explode.png"
+.sprite
+17
+"player_bullet_left_3_explode.png"
+
+.sprite
+25
+"player_bullet_right_explode.png"
+.sprite
+26
+"player_bullet_right_2_explode.png"
+.sprite
+27
+"player_bullet_right_3_explode.png"
+
+.sprite
+117
+"enemy_left_3.png"
+.sprite
+116
+"enemy_left_2.png"
+.sprite
+115
+"enemy_left.png"
+
+.sprite
+227
+"enemy_right_3.png"
+.sprite
+226
+"enemy_right_2.png"
+.sprite
+225
+"enemy_right.png"
+
+.sprite
+256
+"dead.png"
+
+.state
+0
+.set 1
+.if .set 117 & = $0 0 ; .set $0 1 .fi
+.if .set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 .fi
+.if .set 227 & = $1 0 ; .set $1 1 .fi
+.if .set 227 & = $1 1 ; .reset 227 & .set 226 & .set $1 0 .fi 
+.if %.4 ; .set 117 .fi       # if 40% chance
+.if %.4 ; .set 227 .fi
+.if .set $right ; .transition 1 .fi
+.if = $11 3 ; .reset 13 & .set $11 0 .fi
+.if = $11 2 ; .reset 12 & .set 13 & .set $11 3 .fi
+.if = $11 1 ; .reset 11 & .set 12 & .set $11 2 .fi
+.if = $11 0 & .set $fire ; .set 11 & .set $11 1 .fi
+.if .set 11 & .set 115 ; .reset 115 & .reset 11 & .set 15 .fi
+.if .set 12 & .set 116 ; .reset 116 & .reset 12 & .set 16 .fi
+.if .set 13 & .set 117 ; .reset 117 & .reset 13 & .set 17 .fi
+.if .reset 11 & .set 115 ; .reset .all & .set $5 0 & .transition 5 .fi
+.if .set 225 ; .reset .all & .set $5 0 & .transition 5 .fi
+.end
+
+.state
+1
+.reset 1
+.set 2
+.if .set 117 & = $0 0 ; .set $0 1 .fi
+.if .set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 .fi
+.if .set 227
+    & = $1 0 ;
+
+    .set $1 1
+.fi
+.if .set 227 & = $1 1 ; .reset 227 & .set 226 & .set $1 0 .fi
+.if %.4 ; .set 117 .fi       # if 40% chance
+.if %.4 ; .set 227 .fi
+.if .set $left ; .transition 0 .fi
+# idem as above logic
+.end
+
+.state
+5
+.if = .mod $5 2 0 ; .set 256 .fi
+.if = .mod $5 2 1 ; .reset 256 .fi
+.if = $5 5 ; .transition 1 .fi
+.set $5 + $5 1
+.end

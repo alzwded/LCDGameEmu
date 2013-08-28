@@ -23,3 +23,9 @@ parser.c
 
 # exe name
 lcdgameemu
+
+# logs / traces etc
+trace
+lcdgameemu.trace
+log
+lcdgameemu.log

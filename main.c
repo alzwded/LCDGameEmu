@@ -7,6 +7,8 @@ void cleanup()
 {
 }
 
+extern int yydebug;
+
 int load(char const* fileName)
 {
     assert(fileName);
@@ -21,13 +23,15 @@ int load(char const* fileName)
 
     parser_set_stream(f);
 
+    yydebug = 1;
+
     // launch parser
     return yyparse();
 }
 
 void test()
 {
-    load("test-game.db");
+    load("example/test-game.db");
 }
 
 int main(int argc, char* argv[])

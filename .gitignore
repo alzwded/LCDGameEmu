@@ -20,3 +20,6 @@ parser.c
 *.dot
 *.output
 *.ps
+
+# exe name
+lcdgameemu

@@ -9,7 +9,14 @@ typedef struct {
 } sprite_t;
 
 typedef enum {
-    NONE = 0
+    ctNONE = 0,
+    ctREGISTER,
+    ctIDENT,
+    ctCONDITION,
+    ctIF,
+    ctBLOCK,
+    ctARITHMETIC,
+    ctCONST    
 } code_type_t;
 
 typedef struct code_s {
@@ -22,6 +29,7 @@ typedef struct code_s {
         unsigned int num;
         struct code_s* code;
     } right;
+    struct code_s* first;
     struct code_s* next;
     struct code_s* top;
 } code_t;
@@ -53,6 +61,8 @@ void delete_game(game_t**);
 void delete_state(state_t**);
 void delete_sprite(sprite_t**);
 void delete_code(code_t**);
+
+void normalize_code(code_t**);
 
 void parser_set_stream(FILE* f);
 FILE* const parser_get_stream();

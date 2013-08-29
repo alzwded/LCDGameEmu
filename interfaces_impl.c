@@ -96,3 +96,10 @@ state_t* new_state(unsigned id, code_t* code)
     ret->code = code;
     return ret;
 }
+
+void normalize_code(code_t** code)
+{
+    // TODO
+    // left/right = left/right->first;
+    // left/right->top = me
+}

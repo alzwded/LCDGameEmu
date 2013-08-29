@@ -45,7 +45,7 @@ VAR : '$' INT | '$' IDENT ;*/
 
 %type <sprite> sprite
 %type <state> state
-%type <code> code
+%type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition 
 
 %error-verbose
 %token_table
@@ -77,8 +77,30 @@ item : sprite {
 sprite : ".sprite" INT INT INT PATH { $$ = new_sprite($2, $3, $4, strdup($5)); } ;
 state : ".state" INT code { $$ = new_state($2, $3); } ;
 
-code : codes ".end" | ".end" ;
-codes : codes block | block ;
+code : codes ".end" {
+        $$ = NULL;
+        jaklog(TRACE, JAK_STR|JAK_LN, "codes end");
+        }
+     | ".end" {
+        $$ = NULL;
+        jaklog(TRACE, JAK_STR|JAK_LN, "end");
+        }
+     ;
+codes : codes block {
+            jaklog(TRACE, JAK_STR|JAK_LN, "codes block");
+            /*
+            $2->top = $1->top; ?
+            if($1->first) $2->first = $1->first;
+            else $2->first = $1;
+            $1 = $1->next = $2;
+            */
+            $$ = $1;
+        }
+      | block {
+            jaklog(TRACE, JAK_STR|JAK_LN, "block");
+            $$ = $1;
+        }
+      ;
 block : block '&' statement | statement ;
 statement : set_statement
           | conditional_statement
@@ -128,7 +150,16 @@ atomic_condition : isset_expression
 
 condition : condition '&' atomic_condition | atomic_condition ;
 
-conditional_statement : ".if" condition ';' block ".fi" ;
+conditional_statement : ".if" condition ';' block ".fi" {
+        /*
+        code_t* condition = ($2->first) ? $2->first : $2;
+        code_t* action = ($4->first) ? $4->first : $4;
+        $$ = new_conditional(condition, action);
+        $2->top = $$;
+        $4->top = $$;
+        */
+        }
+                      ;
 
 
 %%

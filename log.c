@@ -18,7 +18,7 @@ void jaklog_set_level(log_level_t level)
     }
 }
 
-void jaklog(log_level_t level, int flags, void* stuff)
+void jaklog(log_level_t level, int flags, void const* stuff)
 {
     if(jaklog_level < level) return;
 

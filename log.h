@@ -16,7 +16,7 @@ typedef enum {
     PARSER_TRACE = 4
 } log_level_t;
 
-void jaklog(log_level_t level, int flags, void* stuff);
+void jaklog(log_level_t level, int flags, void const* stuff);
 
 void jaklog_set_level(log_level_t);
 

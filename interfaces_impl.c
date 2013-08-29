@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "interfaces.h"
+#include "log.h"
 
 static FILE* g_parser_stream;
 
@@ -74,12 +75,47 @@ void delete_state(state_t** state)
     *state = NULL;
 }
 
+char const* strct(code_type_t type)
+{
+#ifdef TYPE_TO_STRING
+# error "TYPE_TO_STRING already defined"
+#endif
+#define TYPE_TO_STRING(X) case X: return #X
+    switch(type) {
+    TYPE_TO_STRING(ctNOP);
+    TYPE_TO_STRING(ctREGISTER);
+    TYPE_TO_STRING(ctRESETALL);
+    TYPE_TO_STRING(ctSETVAR);
+    TYPE_TO_STRING(ctSETSPRITE);
+    TYPE_TO_STRING(ctTRANSITION);
+    TYPE_TO_STRING(ctISSPRITE);
+    TYPE_TO_STRING(ctISVAR);
+    TYPE_TO_STRING(ctCONST);
+    TYPE_TO_STRING(ctMUL);
+    TYPE_TO_STRING(ctDIV);
+    TYPE_TO_STRING(ctMOD);
+    TYPE_TO_STRING(ctSUM);
+    TYPE_TO_STRING(ctSUB);
+    TYPE_TO_STRING(ctEQ);
+    TYPE_TO_STRING(ctNE);
+    TYPE_TO_STRING(ctLT);
+    TYPE_TO_STRING(ctGT);
+    TYPE_TO_STRING(ctNOT);
+    TYPE_TO_STRING(ctRNG);
+    TYPE_TO_STRING(ctIF);
+    }
+#undef TYPE_TO_STRING
+}
+
 void delete_code(code_t** code)
 {
     code_t** left = NULL;
     code_t** right = NULL;
 
     if(!code || !*code) return;
+
+    jaklog(TRACE, JAK_STR, "freeing the members of a");
+    jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, strct((*code)->type));
 
     delete_code(&(*code)->next);
 
@@ -108,6 +144,9 @@ void delete_code(code_t** code)
 
     delete_code(left);
     delete_code(right);
+
+    jaklog(TRACE, JAK_STR, "freeing a");
+    jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, strct((*code)->type));
 
     free(*code);
     *code = NULL;

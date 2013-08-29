@@ -4,70 +4,61 @@
 # If I ever finish this project, this game is not to be taken seriously
 # It is an example, duh
 
-.sprite
-1
+.sprite 1 170 40
 "player_left.png"
 
-.sprite
-2
+.sprite 2 230 40
 "player_right.png"
 
-.sprite
-10
+.sprite 10 160 49
 "player_bullet_left.png"
-.sprite
-11
+.sprite 11 130 49
 "player_bullet_left_2.png"
 
-.sprite
-20
+.sprite 20 240 49
 "player_bullet_right.png"
-.sprite
-21
+.sprite 21 270 49
 "player_bullet_right_2.png"
 
-.sprite
-15
+.sprite 15 145 40
 "player_bullet_left_explode.png"
-.sprite
-16
+.sprite 16 300 49
 "player_bullet_left_2_explode.png"
-.sprite
-17
+.sprite 17 0 0
 "player_bullet_left_3_explode.png"
 
 .sprite
-25
+25 0 0
 "player_bullet_right_explode.png"
 .sprite
-26
+26 0 0
 "player_bullet_right_2_explode.png"
 .sprite
-27
+27 0 0
 "player_bullet_right_3_explode.png"
 
 .sprite
-117
+117 0 0
 "enemy_left_3.png"
 .sprite
-116
+116 0 0
 "enemy_left_2.png"
 .sprite
-115
+115 0 0
 "enemy_left.png"
 
 .sprite
-227
+227 0 0
 "enemy_right_3.png"
 .sprite
-226
+226 0 0
 "enemy_right_2.png"
 .sprite
-225
+225 0 0
 "enemy_right.png"
 
 .sprite
-256
+256 0 0
 "dead.png"
 
 .state

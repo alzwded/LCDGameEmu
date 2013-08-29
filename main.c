@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "interfaces.h"
+#include "log.h"
+
+game_t* THEGAME;
 
 void cleanup()
 {
@@ -23,7 +26,8 @@ int load(char const* fileName)
 
     parser_set_stream(f);
 
-    yydebug = 1;
+    //yydebug = 1;
+    jaklog_set_level(TRACE);
 
     // launch parser
     return yyparse();

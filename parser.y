@@ -8,15 +8,21 @@ Grammar for LCDGameEmu .db file
 #include <string.h>
 #include <ctype.h>
 #include "interfaces.h"
+#include "log.h"
 
 #define YYDEBUG 1
 #define YYPRINT(A,B,C) /* empty */
+
+extern game_t* THEGAME;
 
 int yylex();
 %}
 %union {
     char const* str;
     int num;
+    sprite_t* sprite;
+    state_t* state;
+    code_t* code;
 }
 
 /* optional, alternatively use for(YYNTOKENS) strncmp(yytname[i] + 1, s, strlen(s)) return yytoknum[i]
@@ -37,16 +43,39 @@ VAR : '$' INT | '$' IDENT ;*/
 /*%token <int> ASD; %token ASD*/
 /*%type <int> ASD ; %type ASD ; %left ASD */
 
+%type <sprite> sprite
+%type <state> state
+%type <code> code
+
 %error-verbose
 %token_table
 
 %%
 
-file : file item | /*item*/ ;
-item : sprite | state ;
+file : /* NULL */ {
+        jaklog(TRACE, JAK_STR | JAK_LN, "spawning game");
+        THEGAME = new_game();
+        }
+     | file item
+     ;
+item : sprite {
+        jaklog(TRACE, JAK_STR, "adding sprite ");
+        jaklog(TRACE, JAK_TAB, NULL);
+        jaklog(TRACE, JAK_NUM|JAK_LN, &$1->id);
 
-sprite : ".sprite" INT PATH ;
-state : ".state" INT code ;
+        THEGAME->add_sprite(THEGAME, $1);
+        }
+     | state {
+        jaklog(TRACE, JAK_STR, "adding state ");
+        jaklog(TRACE, JAK_TAB, NULL);
+        jaklog(TRACE, JAK_NUM|JAK_LN, &$1->id);
+
+        THEGAME->add_state(THEGAME, $1);
+        }
+     ;
+
+sprite : ".sprite" INT INT INT PATH { $$ = new_sprite($2, $3, $4, strdup($5)); } ;
+state : ".state" INT code { $$ = new_state($2, $3); } ;
 
 code : codes ".end" | ".end" ;
 codes : codes block | block ;

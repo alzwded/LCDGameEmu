@@ -90,7 +90,7 @@ char const* strct(code_type_t type)
 #ifdef TYPE_TO_STRING
 # error "TYPE_TO_STRING already defined"
 #endif
-#define TYPE_TO_STRING(X) case X: return #X
+#define TYPE_TO_STRING(X) case X: return &(#X)[2]
     switch(type) {
     TYPE_TO_STRING(ctNOP);
     TYPE_TO_STRING(ctREGISTER);

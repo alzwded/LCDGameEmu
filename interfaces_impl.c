@@ -103,3 +103,36 @@ void normalize_code(code_t** code)
     // left/right = left/right->first;
     // left/right->top = me
 }
+
+code_t* new_nop()
+{
+    code_t* ret = (code_t*)malloc(sizeof(code_t));
+    ret->type = ctNOP;
+    ret->left.code = NULL;
+    ret->right.code = NULL;
+    ret->first = ret;
+    ret->next = NULL;
+    ret->top = NULL;
+}
+
+code_t* new_reg(int r)
+{
+    code_t* ret = (code_t*)malloc(sizeof(code_t));
+    ret->type = ctREGISTER;
+    ret->left.num = r;
+    ret->right.code = NULL;
+    ret->first = ret;
+    ret->next = NULL;
+    ret->top = NULL;
+}
+
+code_t* new_ident(char* s)
+{
+    code_t* ret = (code_t*)malloc(sizeof(code_t));
+    ret->type = ctREGISTER;
+    ret->left.num = -0xFF; // TODO switch(s) => int
+    ret->right.code = NULL;
+    ret->first = ret;
+    ret->next = NULL;
+    ret->top = NULL;
+}

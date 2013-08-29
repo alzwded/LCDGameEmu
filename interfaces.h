@@ -9,14 +9,13 @@ typedef struct {
 } sprite_t;
 
 typedef enum {
-    ctNONE = 0,
+    ctNOP = 0,
     ctREGISTER,
-    ctIDENT,
     ctCONDITION,
     ctIF,
     ctBLOCK,
     ctARITHMETIC,
-    ctCONST    
+    ctCONST
 } code_type_t;
 
 typedef struct code_s {
@@ -62,6 +61,9 @@ void delete_state(state_t**);
 void delete_sprite(sprite_t**);
 void delete_code(code_t**);
 
+code_t* new_nop();
+code_t* new_reg(int);
+code_t* new_ident(char*);
 void normalize_code(code_t**);
 
 void parser_set_stream(FILE* f);

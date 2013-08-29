@@ -78,40 +78,71 @@ sprite : ".sprite" INT INT INT PATH { $$ = new_sprite($2, $3, $4, strdup($5)); }
 state : ".state" INT code { $$ = new_state($2, $3); } ;
 
 code : codes ".end" {
-        $$ = NULL;
+        assert($1);
+        $$ = ($1->first) ? $1->first : $1 ;
         jaklog(TRACE, JAK_STR|JAK_LN, "codes end");
         }
      | ".end" {
-        $$ = NULL;
+        $$ = new_nop();
         jaklog(TRACE, JAK_STR|JAK_LN, "end");
         }
      ;
 codes : codes block {
-            jaklog(TRACE, JAK_STR|JAK_LN, "codes block");
-            /*
-            $2->top = $1->top; ?
-            if($1->first) $2->first = $1->first;
-            else $2->first = $1;
-            $1 = $1->next = $2;
-            */
-            $$ = $1;
-        }
+        jaklog(TRACE, JAK_STR|JAK_LN, "codes block");
+        assert($1);
+        assert($2);
+        if($1->first) $2->first = $1->first;
+        else $2->first = $1;
+        $1 = $1->next = $2;
+        $$ = $1;
+    }
       | block {
-            jaklog(TRACE, JAK_STR|JAK_LN, "block");
-            $$ = $1;
-        }
+        jaklog(TRACE, JAK_STR|JAK_LN, "block");
+        $$ = $1;
+    }
       ;
-block : block '&' statement | statement ;
-statement : set_statement
-          | conditional_statement
-          | transition_statement
-          | nop
+block : block '&' statement {
+        assert($1);
+        assert($3);
+        if($1->first) $3->first = $1->first;
+        else $3->first = $1;
+        $1 = $1->next = $3;
+        $$ = $1;
+    }
+      | statement {
+        $$ = $1;
+    }
+  ;
+
+statement : set_statement {
+        $$ = $1;
+        }
+          | conditional_statement {
+        $$ = $1;
+        }
+          | transition_statement {
+        $$ = $1;
+        }
+          | nop {
+        $$ = $1;
+        }
           ;
 
-nop : ".nop" ;
+nop : ".nop" {
+        $$ = new_nop();
+        }
+    ;
 
 /* VAR : '$' INT | '$' IDENT ; actually processed in lexer */
-VAR : REG | IDENT ;
+VAR : REG {
+        jaklog(TRACE, JAK_STR, "reading register");
+        jaklog(TRACE, JAK_TAB|JAK_LN|JAK_NUM, &$1);
+        $$ = new_reg($1);
+        }
+    | IDENT {
+        $$ = new_ident(strdup($1));
+        }
+    ;
 set_statement : ".set" INT | ".reset" INT
               | ".set" VAR arithmetic_expression
               | ".reset" ".all"

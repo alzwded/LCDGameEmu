@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "interfaces.h"
 #include "log.h"
+#include "cmdargs.h"
 
 game_t* THEGAME;
 
@@ -27,23 +28,36 @@ int load(char const* fileName)
 
     parser_set_stream(f);
 
-    //yydebug = 1;
-    jaklog_set_level(TRACE);
-
     // launch parser
     return yyparse();
 }
 
+static char const* fileName = "example/test-game.lge";
+
 void test()
 {
-    load("example/test-game.lge");
+    load(fileName);
     cleanup();
+}
+
+void args_set_debug_level(char const* s)
+{
+    jaklog_set_level((log_level_t)atoi(s));
+}
+
+void args_load(char const* s)
+{
+    fileName = s;
 }
 
 int main(int argc, char* argv[])
 {
+    //yydebug = 1;
+    jaklog_set_level(TRACE);
+
     // TODO actually implement front-end
     // TODO open main window()
+    HandleParameters(argc, argv);
 
     test();
 

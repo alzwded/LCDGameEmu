@@ -4,11 +4,14 @@ Grammar for LCDGameEmu .db file
 */
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #include "interfaces.h"
 #include "log.h"
+
+int yyerror(char const*);
 
 #define YYDEBUG 1
 #define YYPRINT(A,B,C) /* empty */
@@ -261,7 +264,6 @@ int yylex()
     int i = 0;
     char c = EOF;
     size_t size = 0;
-    char* s = NULL;
 
     pNode_t n = NULL;
     pNode_t pn = NULL;
@@ -272,7 +274,7 @@ int yylex()
             else break;
         }
         i = fgetc(parser_get_stream());
-        if(i == EOF) if(state == lsFIRST) return 0; else break;
+        if(i == EOF) { if(state == lsFIRST) return 0; else break; }
 
         c = (char)i;
 #ifdef PERSONAL_TRACE
@@ -317,7 +319,7 @@ int yylex()
             }
         }
 
-        if(isspace(c)) if(state == lsFIRST) continue; else break;
+        if(isspace(c)) { if(state == lsFIRST) continue; else break; }
 
         if(state == lsFIRST && c == '$') {
             state = lsVARREG;
@@ -423,7 +425,8 @@ int yylex()
     }
 }
 
-int yyerror(char* s)
+int yyerror(char const* s)
 {
     fprintf(stderr, "%s\n", s);
+    return 0;
 }

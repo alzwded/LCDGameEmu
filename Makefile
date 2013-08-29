@@ -4,7 +4,7 @@ MAINOBJ = main.o
 EXE = lcdgameemu
 OBJS = parser.o interfaces_impl.o log.o
 CC = gcc
-COPTS = -g -c -I.
+COPTS = -g -c -I. -Wall
 LD = gcc
 LDOPTS = 
 

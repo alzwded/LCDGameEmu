@@ -33,7 +33,7 @@ void jaklog(log_level_t level, int flags, void* stuff)
         col = 0;
         strftime(s, 9, "%H:%M:%S", t);
 
-        fprintf(stderr, "%s", s);
+        fprintf(stderr, "%-8s ", s);
     }
 
     if(flags & JAK_TAB) {
@@ -44,7 +44,7 @@ void jaklog(log_level_t level, int flags, void* stuff)
             }
         } else {
             fprintf(stderr, "\n");
-            fprintf(stderr, "%-8c", '+');
+            fprintf(stderr, "%-8c ", '+');
             col = 0;
         }
     }

@@ -8,6 +8,7 @@ game_t* THEGAME;
 
 void cleanup()
 {
+    delete_game(&THEGAME);
 }
 
 extern int yydebug;
@@ -36,6 +37,7 @@ int load(char const* fileName)
 void test()
 {
     load("example/test-game.lge");
+    cleanup();
 }
 
 int main(int argc, char* argv[])

@@ -76,7 +76,41 @@ void delete_state(state_t** state)
 
 void delete_code(code_t** code)
 {
-    // TODO
+    code_t** left = NULL;
+    code_t** right = NULL;
+
+    if(!code || !*code) return;
+
+    delete_code(&(*code)->next);
+
+    switch((*code)->type) {
+    case ctSETVAR:
+    case ctIF:
+    case ctMUL:
+    case ctDIV:
+    case ctMOD:
+    case ctSUM:
+    case ctSUB:
+    case ctEQ:
+    case ctNE:
+    case ctLT:
+    case ctGT:
+        left = &(*code)->left.code;
+        right = &(*code)->right.code;
+        break;
+    case ctNOT:
+    case ctISVAR:
+        left = &(*code)->left.code;
+        break;
+    default:
+        break;
+    }
+
+    delete_code(left);
+    delete_code(right);
+
+    free(*code);
+    *code = NULL;
 }
 
 sprite_t* new_sprite(unsigned id, unsigned x, unsigned y, char* path)
@@ -113,26 +147,93 @@ code_t* new_nop()
     ret->first = ret;
     ret->next = NULL;
     ret->top = NULL;
+    return ret;
 }
 
 code_t* new_reg(int r)
 {
-    code_t* ret = (code_t*)malloc(sizeof(code_t));
+    code_t* ret = new_nop();
     ret->type = ctREGISTER;
     ret->left.num = r;
-    ret->right.code = NULL;
-    ret->first = ret;
-    ret->next = NULL;
-    ret->top = NULL;
+    return ret;
 }
 
 code_t* new_ident(char* s)
 {
-    code_t* ret = (code_t*)malloc(sizeof(code_t));
+    code_t* ret = new_nop();
     ret->type = ctREGISTER;
     ret->left.num = -0xFF; // TODO switch(s) => int
-    ret->right.code = NULL;
-    ret->first = ret;
-    ret->next = NULL;
-    ret->top = NULL;
+    return ret;
+}
+
+code_t* new_set_sprite(int sprite, sprite_state_t state)
+{
+    code_t* ret = new_nop();
+    ret->type = ctSETSPRITE;
+    ret->left.num = sprite;
+    ret->right.num = (int)state;
+    return ret;
+}
+code_t* new_set_var(code_t* var, code_t* value)
+{
+    code_t* ret = new_binfunc(ctSETVAR, var, value);
+    return ret;
+}
+code_t* new_reset_all()
+{
+    code_t* ret = new_nop();
+    ret->type = ctRESETALL;
+    return ret;
+}
+code_t* new_transition(int t)
+{
+    code_t* ret = new_nop();
+    ret->type = ctTRANSITION;
+    ret->left.num = t;
+    return ret;
+}
+code_t* new_is_sprite(int sprite, sprite_state_t state)
+{
+    code_t* ret = new_nop();
+    ret->type = ctISSPRITE;
+    ret->left.num = sprite;
+    ret->right.num = (int)state;
+    return ret;
+}
+code_t* new_is_var(code_t* var, sprite_state_t state)
+{
+    code_t* ret = new_nop();
+    ret->type = ctISVAR;
+    ret->left.code = var;
+    ret->right.num = (int)state;
+    return ret;
+}
+code_t* new_const(int c)
+{
+    code_t* ret = new_nop();
+    ret->type = ctCONST;
+    ret->left.num = c;
+    return ret;
+}
+code_t* new_binfunc(code_type_t type, code_t* left, code_t* right)
+{
+    code_t* ret = new_nop();
+    ret->type = type;
+    ret->left.code = left->first;
+    ret->left.code->top = ret;
+    ret->right.code = right->first;
+    ret->right.code->top = ret;
+    return ret;
+}
+code_t* new_rng(int p)
+{
+    code_t* ret = new_nop();
+    ret->type = ctRNG;
+    ret->left.num = p;
+    return ret;
+}
+code_t* new_if(code_t* left, code_t* right)
+{
+    code_t* ret = new_binfunc(ctIF, left, right);
+    return ret;
 }

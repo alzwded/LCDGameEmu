@@ -143,54 +143,72 @@ VAR : REG {
         $$ = new_ident(strdup($1));
         }
     ;
-set_statement : ".set" INT | ".reset" INT
-              | ".set" VAR arithmetic_expression
-              | ".reset" ".all"
+set_statement : ".set" INT {
+        $$ = new_set_sprite($2, ssON);
+        }
+              | ".reset" INT {
+        $$ = new_set_sprite($2, ssOFF);
+        }
+              | ".set" VAR arithmetic_expression {
+        $$ = new_set_var($2, $3);
+        }
+              | ".reset" ".all" {
+        $$ = new_reset_all();
+        }
               ;
-transition_statement : ".transition" INT ;
+transition_statement : ".transition" INT {
+        $$ = new_transition($2);
+        }
+                     ;
 
-isset_expression : ".set" INT | ".reset" INT
-                 | ".set" IDENT | ".reset" IDENT ;
-
-arithmetic_expression : ".mul" operand operand
-                      | ".div" operand operand
-                      | ".mod" operand operand
-                      | ".sum" operand operand
-                      | ".sub" operand operand
-                      | '*' operand operand
-                      | '/' operand operand
-                      | '+' operand operand
-                      | '-' operand operand
-                      | INT
-                      ;
-
-operand : VAR | arithmetic_expression ;
-
-equality_expression : '=' operand operand
-                    | '!' operand operand
-                    | '<' operand operand
-                    | '>' operand operand
-                    ;
-
-rng_expression : "%." INT ;
-
-atomic_condition : isset_expression
-                 | equality_expression
-                 | rng_expression
+isset_expression : ".set" INT { $$ = new_is_sprite($2, ssON); }
+                 | ".reset" INT { $$ = new_is_sprite($2, ssOFF); }
+                 | ".set" VAR { $$ = new_is_var($2, ssON); }
+                 | ".reset" VAR { $$ = new_is_var($2, ssOFF); }
                  ;
 
-condition : condition '&' atomic_condition | atomic_condition ;
-
-conditional_statement : ".if" condition ';' block ".fi" {
-        /*
-        code_t* condition = ($2->first) ? $2->first : $2;
-        code_t* action = ($4->first) ? $4->first : $4;
-        $$ = new_conditional(condition, action);
-        $2->top = $$;
-        $4->top = $$;
-        */
-        }
+arithmetic_expression : ".mul" operand operand { $$ = new_binfunc(ctMUL, $2, $3); }
+                      | ".div" operand operand { $$ = new_binfunc(ctDIV, $2, $3); }
+                      | ".mod" operand operand { $$ = new_binfunc(ctMOD, $2, $3); }
+                      | ".sum" operand operand { $$ = new_binfunc(ctSUM, $2, $3); }
+                      | ".sub" operand operand { $$ = new_binfunc(ctSUB, $2, $3); }
+                      | '*' operand operand { $$ = new_binfunc(ctMUL, $2, $3); }
+                      | '/' operand operand { $$ = new_binfunc(ctDIV, $2, $3); }
+                      | '+' operand operand { $$ = new_binfunc(ctSUM, $2, $3); }
+                      | '-' operand operand { $$ = new_binfunc(ctSUB, $2, $3); }
+                      | INT { $$ = new_const($1); }
                       ;
+
+operand : VAR { $$ = $1; }
+        | arithmetic_expression { $$ = $1; }
+        ;
+
+equality_expression : '=' operand operand { $$ = new_binfunc(ctEQ, $2, $3); }
+                    | '!' operand operand { $$ = new_binfunc(ctNE, $2, $3); }
+                    | '<' operand operand { $$ = new_binfunc(ctLT, $2, $3); }
+                    | '>' operand operand { $$ = new_binfunc(ctGT, $2, $3); }
+                    | '~' operand { $$ = new_binfunc(ctNOT, $2, NULL); }
+                    ;
+
+rng_expression : "%." INT { $$ = new_rng($2); } ;
+
+atomic_condition : isset_expression { $$ = $1; }
+                 | equality_expression { $$ = $1; }
+                 | rng_expression { $$ = $1; }
+                 ;
+
+condition : condition '&' atomic_condition {
+        assert($1);
+        assert($3);
+        if($1->first) $3->first = $1->first;
+        else $3->first = $1;
+        $1 = $1->next = $3;
+        $$ = $1;
+        }
+          | atomic_condition { $$ = $1; }
+          ;
+
+conditional_statement : ".if" condition ';' block ".fi" { $$ = new_if($2, $4); } ;
 
 
 %%
@@ -287,6 +305,7 @@ int yylex()
             case '-':
             case '*':
             case '/':
+            case '~':
                 return c;
             case '%':
                 if(feof(parser_get_stream())) return BAD_TOKEN;

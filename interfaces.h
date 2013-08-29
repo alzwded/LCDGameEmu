@@ -11,12 +11,22 @@ typedef struct {
 typedef enum {
     ctNOP = 0,
     ctREGISTER,
-    ctCONDITION,
-    ctIF,
-    ctBLOCK,
-    ctARITHMETIC,
-    ctCONST
+    ctRESETALL,
+    ctSETVAR,
+    ctSETSPRITE,
+    ctTRANSITION,
+    ctISSPRITE,
+    ctISVAR,
+    ctCONST,
+    ctMUL, ctDIV, ctMOD, ctSUM, ctSUB,
+    ctEQ, ctNE, ctLT, ctGT, ctNOT,
+    ctRNG, ctIF
 } code_type_t;
+
+typedef enum {
+    ssOFF = 0,
+    ssON = 1
+} sprite_state_t;
 
 typedef struct code_s {
     code_type_t type;
@@ -64,6 +74,16 @@ void delete_code(code_t**);
 code_t* new_nop();
 code_t* new_reg(int);
 code_t* new_ident(char*);
+code_t* new_set_sprite(int, sprite_state_t);
+code_t* new_set_var(code_t* var, code_t* value);
+code_t* new_reset_all();
+code_t* new_transition(int);
+code_t* new_is_sprite(int, sprite_state_t);
+code_t* new_is_var(code_t*, sprite_state_t);
+code_t* new_const(int);
+code_t* new_binfunc(code_type_t, code_t*, code_t*);
+code_t* new_rng(int);
+code_t* new_if(code_t*, code_t*);
 void normalize_code(code_t**);
 
 void parser_set_stream(FILE* f);

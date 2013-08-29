@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 
+#define MAGIC_COL_SPAN 70
+
 static log_level_t jaklog_level = WARNING;
 
 static int col = -8;
@@ -37,8 +39,8 @@ void jaklog(log_level_t level, int flags, void const* stuff)
     }
 
     if(flags & JAK_TAB) {
-        if(col < 72 / 2) {
-            while(col < 72 / 2) {
+        if(col < MAGIC_COL_SPAN / 2) {
+            while(col < MAGIC_COL_SPAN / 2) {
                 fprintf(stderr, " ");
                 col++;
             }
@@ -50,18 +52,32 @@ void jaklog(log_level_t level, int flags, void const* stuff)
     }
     if(flags & JAK_NUM) {
         unsigned num = *(unsigned*)stuff;
-        fprintf(stderr, "%d", num);
+        unsigned copy = num;
         while(num) {
             col++;
             num /= 10;
         }
+        if(col > MAGIC_COL_SPAN) {
+            col = 0;
+            fprintf(stderr, "\n%-8c ", '+');
+        }
+        fprintf(stderr, "%d", copy);
     } else if(flags & JAK_STR) {
         char* s = (char*)stuff;
-        fprintf(stderr, "%s", s);
-        col += strlen(s);
+        for(; s && *s; ++s) {
+            if(col > MAGIC_COL_SPAN) {
+                col = 0;
+                fprintf(stderr, "\n%-8c ", '+');
+            }
+            col++;
+            fprintf(stderr, "%c", *s);
+        }
     }
-    if(flags & JAK_LN || col > 72) {
+    if(flags & JAK_LN) {
         col = -8;
         fprintf(stderr, "\n");
+    } else if(col > MAGIC_COL_SPAN) {
+        col = 0;
+        fprintf(stderr, "\n%-8c ", '+');
     }
 }

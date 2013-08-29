@@ -15,6 +15,14 @@ void parser_set_stream(FILE* f)
     g_parser_stream = f;
 }
 
+int _pint_comparator(void const* a, void const* b)
+{
+    int* left = (int*)a;
+    int* right = (int*)b;
+
+    return *left < *right;
+}
+
 void _game_add_state(struct game_s* this, state_t* s)
 {
     if(this->nstates >= this->cstates) {
@@ -22,6 +30,7 @@ void _game_add_state(struct game_s* this, state_t* s)
         this->cstates <<= 1;
     }
     this->states[this->nstates++] = s;
+    qsort(this->states, this->nstates, sizeof(state_t*), _pint_comparator);
 }
 
 void _game_add_sprite(struct game_s* this, sprite_t* s)
@@ -31,6 +40,7 @@ void _game_add_sprite(struct game_s* this, sprite_t* s)
         this->csprites <<= 1;
     }
     this->sprites[this->nsprites++] = s;
+    qsort(this->sprites, this->nsprites, sizeof(sprite_t*), _pint_comparator);
 }
 
 game_t* new_game()
@@ -105,6 +115,7 @@ char const* strct(code_type_t type)
     TYPE_TO_STRING(ctIF);
     }
 #undef TYPE_TO_STRING
+    return "";
 }
 
 void delete_code(code_t** code)

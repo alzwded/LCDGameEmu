@@ -38,6 +38,7 @@ void test()
 {
     load(fileName);
     cleanup();
+    jaklog(FATAL, JAK_STR|JAK_LN, "testing veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery long string");
 }
 
 void args_set_debug_level(char const* s)

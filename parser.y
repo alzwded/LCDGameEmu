@@ -60,8 +60,8 @@ file : /* NULL */ {
      ;
 item : sprite {
         jaklog(TRACE, JAK_STR, "adding sprite ");
-        jaklog(TRACE, JAK_TAB, NULL);
-        jaklog(TRACE, JAK_NUM|JAK_LN, &$1->id);
+        jaklog(TRACE, JAK_TAB|JAK_NUM, &$1->id);
+        jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, $1->path);
 
         THEGAME->add_sprite(THEGAME, $1);
         }

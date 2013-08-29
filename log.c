@@ -44,9 +44,9 @@ void jaklog(log_level_t level, int flags, void* stuff)
             }
         } else {
             fprintf(stderr, "\n");
-            col = -8;
+            fprintf(stderr, "%-8c", '+');
+            col = 0;
         }
-        return;
     }
     if(flags & JAK_NUM) {
         unsigned num = *(unsigned*)stuff;

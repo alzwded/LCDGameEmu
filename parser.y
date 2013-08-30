@@ -144,13 +144,14 @@ arithmetic_expression : ".mul" operand operand { $$ = new_binfunc(ctMUL, $2, $3)
 
 operand : VAR { $$ = $1; }
         | arithmetic_expression { $$ = $1; }
+        | equality_expression { $$ = $1; }
         ;
 
 equality_expression : '=' operand operand { $$ = new_binfunc(ctEQ, $2, $3); }
                     | '!' operand operand { $$ = new_binfunc(ctNE, $2, $3); }
                     | '<' operand operand { $$ = new_binfunc(ctLT, $2, $3); }
                     | '>' operand operand { $$ = new_binfunc(ctGT, $2, $3); }
-                    | '~' operand { $$ = new_binfunc(ctNOT, $2, NULL); }
+                    | '~' operand { $$ = new_not($2); }
                     ;
 
 rng_expression : "%." INT { $$ = new_rng($2); } ;

@@ -61,6 +61,11 @@
 "dead.png"
 
 .state
+127
+.if ~ $left & ~ ~ $right ; .transition 0 .fi
+.end
+
+.state
 0
 .set 1
 .if .set 117 & = $0 0 ; .set $0 1 .fi
@@ -113,6 +118,3 @@
 .fi
 .end
 
-.state
-127
-.end

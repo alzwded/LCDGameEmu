@@ -87,3 +87,37 @@ This is not.
 The would have been no point to introduce the notion of "variables" or "stacks" since in that case, someone would've been able to actually implement decent quicky-games on this thing. That is not the point. The point is to force people to create emulations of bad chineso-british LCD games (like Nintendo's Game&Watch games, only bad and done in a hurry with 0 funding or research).
 
 For more info on the scripting language, examine the test-game.lge closely.
+
+Register machine description
+============================
+
+This describes the emulated machine your code runs on.
+
+Registers
+---------
+
+$0-$99: 100 general purpose WORD sized unsigned registers. This means that normally you should be able to store values from 0..2^32-1. They are accessed using $N from code.
+
+Instruction pointer: Internal register. This is literally a code_t* that stores the currently executing instruction. After a clock cycle / transition, this is set to the first instruction to be executed. It is set to the first instruction of the current state upon a clock pulse.
+
+Stack pointer: Internal register. This is used to store the return information upon entering a .call . It is theoretically limitless. It is implemented as a vector, so it grows as it is needed. Initially it is 2 and grows exponentially afterwards. It's an infinite stack for all inherent purposes. It is initially blank. It is empty before the execution of code on the clock posedge. (because if it wouldn't be, you would most likely have halted the emulated CPU with an infinite loop or something)
+
+State pointer: Internal register. It points to the currently active state. On the clock posedge is sets the IP to the first instruction of state pointed to by this. It is modified using the .transition instruction in code.
+
+Sprite register: Internal register. It is a register whose width is that of the number of sprites you have defined. Active bits cause sprites to be lit (i.e. made visible) on the display. This can be modified and/or queried using the .set and .reset logical statements.
+
+Input register: Internal register. Individual bits are connected to the various outside input buttons. The values can be querried using the special $<name> registers. Even though they're only bits, they appear as wider registeres. You should query them something like: .if ~ $left ; or .if ~ ~ $right ;
+
+Display
+-------
+
+The sprites you defined will appear on-screen with their top-left corner at the coordinates you define. Transparency is handled.
+
+A sprite is displayed if its bit (hence the unique int ids of the sprites in an .lge file) is set. These bits are set using the .set or .reset statements.
+
+There is an internal path-name translator that makes sure a bitmap is only loaded once even if it's referenced multiple times.
+
+Clock
+-----
+
+The clock visible to the outside world is the internal one that runs at 100/200ms intervals. State transitions happen at this interval. Upon a transition, the code assigned to that transition will trigger. The internal code interpretation is done "instantaneuously", i.e. at the host's CPU speed. This emulated the hard-wired behaviour many of these things seem to have.

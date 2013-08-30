@@ -33,7 +33,7 @@ void HandleParameters(int argc, char* argv[])
         size_t len = strlen(s);
         const Option* p = &Options[0];
         for(;
-            p->LongName != NULL && p->ShortName != '\0';
+            p->LongName != NULL || p->ShortName != '\0';
             ++p)
         {
             if(len >= 2) {
@@ -143,7 +143,7 @@ void GetHelp(char const* _)
 
     printf("lcdgameemu\noptions:\n");
 
-    for(; p->LongName != NULL && p->ShortName != '\0'; ++p)
+    for(; p->LongName != NULL || p->ShortName != '\0'; ++p)
     {
 #define INDENT_VALUE (2 + 15 + 1 + 2 + 1 + 3)
         static int const _indent = INDENT_VALUE;

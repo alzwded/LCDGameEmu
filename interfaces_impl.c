@@ -15,10 +15,12 @@ void parser_set_stream(FILE* f)
     g_parser_stream = f;
 }
 
+// comparator used to sort states, sprites and macros
+// relies on the fact that all of these have an int id as the first member
 int _pint_comparator(void const* a, void const* b)
 {
-    int* left = (int*)a;
-    int* right = (int*)b;
+    unsigned* left = (unsigned*)a;
+    unsigned* right = (unsigned*)b;
 
     return *left < *right;
 }
@@ -40,28 +42,6 @@ void _game_add_##TYPE(struct game_s* this, TYPE##_t * s) \
 DECL_GAME_ADD_STUFF_METHOD(state)
 DECL_GAME_ADD_STUFF_METHOD(sprite)
 DECL_GAME_ADD_STUFF_METHOD(macro)
-
-/*
-void _game_add_state(struct game_s* this, state_t* s)
-{
-    if(this->nstates >= this->cstates) {
-        this->states = (state_t**)realloc(this->states, sizeof(state_t*) * (this->cstates << 1));
-        this->cstates <<= 1;
-    }
-    this->states[this->nstates++] = s;
-    qsort(this->states, this->nstates, sizeof(state_t*), _pint_comparator);
-}
-
-void _game_add_sprite(struct game_s* this, sprite_t* s)
-{
-    if(this->nsprites >= this->csprites) {
-        this->sprites = (sprite_t**)realloc(this->sprites, sizeof(sprite_t*) * (this->csprites << 1));
-        this->csprites <<= 1;
-    }
-    this->sprites[this->nsprites++] = s;
-    qsort(this->sprites, this->nsprites, sizeof(sprite_t*), _pint_comparator);
-}
-*/
 
 game_t* new_game()
 {
@@ -223,13 +203,6 @@ macro_t* new_macro(unsigned id, code_t* code)
     return ret;
 }
 
-void normalize_code(code_t** code)
-{
-    // TODO
-    // left/right = left/right->first;
-    // left/right->top = me
-}
-
 code_t* new_nop()
 {
     code_t* ret = (code_t*)malloc(sizeof(code_t));
@@ -242,7 +215,7 @@ code_t* new_nop()
     return ret;
 }
 
-code_t* new_reg(int r)
+code_t* new_reg(unsigned r)
 {
     code_t* ret = new_nop();
     ret->type = ctREGISTER;
@@ -258,55 +231,62 @@ code_t* new_ident(char* s)
     return ret;
 }
 
-code_t* new_set_sprite(int sprite, sprite_state_t state)
+code_t* new_set_sprite(unsigned sprite, sprite_state_t state)
 {
     code_t* ret = new_nop();
     ret->type = ctSETSPRITE;
     ret->left.num = sprite;
-    ret->right.num = (int)state;
+    ret->right.num = (unsigned)state;
     return ret;
 }
+
 code_t* new_set_var(code_t* var, code_t* value)
 {
     code_t* ret = new_binfunc(ctSETVAR, var, value);
     return ret;
 }
+
 code_t* new_reset_all()
 {
     code_t* ret = new_nop();
     ret->type = ctRESETALL;
     return ret;
 }
-code_t* new_transition(int t)
+
+code_t* new_transition(unsigned t)
 {
     code_t* ret = new_nop();
     ret->type = ctTRANSITION;
     ret->left.num = t;
     return ret;
 }
-code_t* new_is_sprite(int sprite, sprite_state_t state)
+
+code_t* new_is_sprite(unsigned sprite, sprite_state_t state)
 {
     code_t* ret = new_nop();
     ret->type = ctISSPRITE;
     ret->left.num = sprite;
-    ret->right.num = (int)state;
+    ret->right.num = (unsigned)state;
     return ret;
 }
+
 code_t* new_is_var(code_t* var, sprite_state_t state)
 {
     code_t* ret = new_nop();
     ret->type = ctISVAR;
     ret->left.code = var;
-    ret->right.num = (int)state;
+    ret->right.num = (unsigned)state;
     return ret;
 }
-code_t* new_const(int c)
+
+code_t* new_const(unsigned c)
 {
     code_t* ret = new_nop();
     ret->type = ctCONST;
     ret->left.num = c;
     return ret;
 }
+
 code_t* new_binfunc(code_type_t type, code_t* left, code_t* right)
 {
     code_t* ret = new_nop();
@@ -317,13 +297,15 @@ code_t* new_binfunc(code_type_t type, code_t* left, code_t* right)
     ret->right.code->top = ret;
     return ret;
 }
-code_t* new_rng(int p)
+
+code_t* new_rng(unsigned p)
 {
     code_t* ret = new_nop();
     ret->type = ctRNG;
     ret->left.num = p;
     return ret;
 }
+
 code_t* new_if(code_t* left, code_t* right)
 {
     code_t* ret = new_binfunc(ctIF, left, right);

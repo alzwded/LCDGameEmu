@@ -4,7 +4,7 @@
 struct FILE;
 
 typedef struct {
-    unsigned int id, x, y;
+    unsigned id, x, y;
     char* path;
 } sprite_t;
 
@@ -31,11 +31,11 @@ typedef enum {
 typedef struct code_s {
     code_type_t type;
     union {
-        unsigned int num;
+        unsigned num;
         struct code_s* code;
     } left;
     union {
-        unsigned int num;
+        unsigned num;
         struct code_s* code;
     } right;
     struct code_s* first;
@@ -44,12 +44,12 @@ typedef struct code_s {
 } code_t;
 
 typedef struct {
-    unsigned int id;
+    unsigned id;
     code_t* code;
 } state_t;
 
 typedef struct {
-    unsigned int id;
+    unsigned id;
     code_t* code;
 } macro_t;
 
@@ -83,22 +83,24 @@ void delete_sprite(sprite_t**);
 void delete_code(code_t**);
 void delete_macro(macro_t**);
 
+// code_t factories
 code_t* new_nop();
-code_t* new_reg(int);
+code_t* new_reg(unsigned);
 code_t* new_ident(char*);
-code_t* new_set_sprite(int, sprite_state_t);
+code_t* new_set_sprite(unsigned, sprite_state_t);
 code_t* new_set_var(code_t* var, code_t* value);
 code_t* new_reset_all();
-code_t* new_transition(int);
-code_t* new_is_sprite(int, sprite_state_t);
+code_t* new_transition(unsigned);
+code_t* new_is_sprite(unsigned, sprite_state_t);
 code_t* new_is_var(code_t*, sprite_state_t);
-code_t* new_const(int);
+code_t* new_const(unsigned);
 code_t* new_binfunc(code_type_t, code_t*, code_t*);
-code_t* new_rng(int);
+code_t* new_rng(unsigned);
 code_t* new_if(code_t*, code_t*);
 code_t* new_call(unsigned);
 void normalize_code(code_t**);
 
+// set the stream the lexer uses
 void parser_set_stream(FILE* f);
 FILE* const parser_get_stream();
 

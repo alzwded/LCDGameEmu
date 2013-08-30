@@ -1,6 +1,5 @@
 /*
-Grammar for LCDGameEmu .db file
-.db is a working extension ; TODO come up with a better extension
+Grammar for LGEScript .lge files
 */
 %{
 #include <stdio.h>
@@ -14,21 +13,26 @@ Grammar for LCDGameEmu .db file
 int yyerror(char const*);
 
 #define YYDEBUG 1
+// define YYPRINT for yytoknum to help the lexer ;
+// I don't want to redefine all keywords again since bison does that
+//    for me anyway
 #define YYPRINT(A,B,C) /* empty */
 
+// if bison can define global variables, by God so can I!
 extern game_t* THEGAME;
 
 int yylex();
 %}
 %union {
     char const* str;
-    int num;
+    unsigned num;
     sprite_t* sprite;
     state_t* state;
     code_t* code;
     macro_t* macro;
 }
 
+/* BAD_TOKEN is used to signal a lexer error */
 %token BAD_TOKEN
 %token <num> REG
 %token <str> PATH IDENT
@@ -44,36 +48,22 @@ VAR : '$' INT | '$' IDENT ;*/
 %type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition call_statement
 
 %error-verbose
+/* define the token table to help the lexer */
 %token_table
 
 %%
 
 file : /* NULL */ {
+        /* this is the first thing that's triggered, so instantiate the
+           game structure */
         jaklog(TRACE, JAK_STR | JAK_LN, "spawning game");
         THEGAME = new_game();
         }
      | file item
      ;
-item : sprite {
-        jaklog(TRACE, JAK_STR, "adding sprite ");
-        jaklog(TRACE, JAK_TAB|JAK_NUM, &$1->id);
-        jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, $1->path);
-
-        THEGAME->add_sprite(THEGAME, $1);
-        }
-     | state {
-        jaklog(TRACE, JAK_STR, "adding state ");
-        jaklog(TRACE, JAK_TAB, NULL);
-        jaklog(TRACE, JAK_NUM|JAK_LN, &$1->id);
-
-        THEGAME->add_state(THEGAME, $1);
-        }
-     | macro {
-        jaklog(TRACE, JAK_STR, "adding macro ");
-        jaklog(TRACE, JAK_TAB|JAK_NUM|JAK_LN, &$1->id);
-
-        THEGAME->add_macro(THEGAME, $1);
-        }
+item : sprite { THEGAME->add_sprite(THEGAME, $1); }
+     | state { THEGAME->add_state(THEGAME, $1); }
+     | macro { THEGAME->add_macro(THEGAME, $1); }
      ;
 
 macro: ".macro" INT code { $$ = new_macro($2, $3); }
@@ -84,15 +74,13 @@ state : ".state" INT code { $$ = new_state($2, $3); } ;
 code : codes ".end" {
         assert($1);
         $$ = ($1->first) ? $1->first : $1 ;
-        jaklog(TRACE, JAK_STR|JAK_LN, "codes end");
         }
-     | ".end" {
-        $$ = new_nop();
-        jaklog(TRACE, JAK_STR|JAK_LN, "end");
-        }
+     | ".end" { $$ = new_nop(); } /* no code in current section
+                                     this is equivalent to a HALT loop
+                                  */
      ;
+
 codes : codes block {
-        jaklog(TRACE, JAK_STR|JAK_LN, "codes block");
         assert($1);
         assert($2);
         if($1->first) $2->first = $1->first;
@@ -100,10 +88,7 @@ codes : codes block {
         $1 = $1->next = $2;
         $$ = $1;
     }
-      | block {
-        jaklog(TRACE, JAK_STR|JAK_LN, "block");
-        $$ = $1;
-    }
+      | block { $$ = $1; }
       ;
 block : block '&' statement {
         assert($1);
@@ -113,64 +98,30 @@ block : block '&' statement {
         $1 = $1->next = $3;
         $$ = $1;
     }
-      | statement {
-        $$ = $1;
-    }
+      | statement { $$ = $1; }
   ;
 
-statement : set_statement {
-        $$ = $1;
-        }
-          | conditional_statement {
-        $$ = $1;
-        }
-          | transition_statement {
-        $$ = $1;
-        }
-          | nop {
-        $$ = $1;
-        }
-          | call_statement {
-        $$ = $1;
-        }
+statement : set_statement { $$ = $1; }
+          | conditional_statement { $$ = $1; }
+          | transition_statement { $$ = $1; }
+          | nop { $$ = $1; }
+          | call_statement { $$ = $1; }
           ;
 
-call_statement : ".call" INT {
-        $$ = new_call($2);
-        }
-        ;
+call_statement : ".call" INT { $$ = new_call($2); } ;
 
-nop : ".nop" {
-        $$ = new_nop();
-        }
-    ;
+nop : ".nop" { $$ = new_nop(); } ;
 
 /* VAR : '$' INT | '$' IDENT ; actually processed in lexer */
-VAR : REG {
-        jaklog(TRACE, JAK_STR, "reading register");
-        jaklog(TRACE, JAK_TAB|JAK_LN|JAK_NUM, &$1);
-        $$ = new_reg($1);
-        }
-    | IDENT {
-        $$ = new_ident(strdup($1));
-        }
+VAR : REG { $$ = new_reg($1); }
+    | IDENT { $$ = new_ident(strdup($1)); }
     ;
-set_statement : ".set" INT {
-        $$ = new_set_sprite($2, ssON);
-        }
-              | ".reset" INT {
-        $$ = new_set_sprite($2, ssOFF);
-        }
-              | ".set" VAR arithmetic_expression {
-        $$ = new_set_var($2, $3);
-        }
-              | ".reset" ".all" {
-        $$ = new_reset_all();
-        }
+set_statement : ".set" INT { $$ = new_set_sprite($2, ssON); }
+              | ".reset" INT { $$ = new_set_sprite($2, ssOFF); }
+              | ".set" VAR arithmetic_expression { $$ = new_set_var($2, $3); }
+              | ".reset" ".all" { $$ = new_reset_all(); }
               ;
-transition_statement : ".transition" INT {
-        $$ = new_transition($2);
-        }
+transition_statement : ".transition" INT { $$ = new_transition($2); }
                      ;
 
 isset_expression : ".set" INT { $$ = new_is_sprite($2, ssON); }
@@ -229,7 +180,7 @@ typedef struct node_s {
     char c;
     struct node_s* n;
 } node_t, *pNode_t;
-//typedef node_t* pNode_t;
+
 pNode_t new_node(char const c)
 {
     pNode_t ret = (pNode_t)malloc(sizeof(node_t));
@@ -237,6 +188,7 @@ pNode_t new_node(char const c)
     ret->n = NULL;
     return ret;
 }
+
 void yylex_move(pNode_t n, size_t const size)
 {
     assert(size);
@@ -257,8 +209,6 @@ void yylex_move(pNode_t n, size_t const size)
 int yylex()
 {
     // I've decided not to use flex
-    // TODO
-
     typedef enum {
         lsFIRST = 0,
         lsVARREG,
@@ -272,6 +222,8 @@ int yylex()
 
     int i = 0;
     char c = EOF;
+
+    // size of read string
     size_t size = 0;
 
     pNode_t n = NULL;
@@ -296,7 +248,6 @@ int yylex()
             }
             continue;
         }
-
 
         if(c == '#') {
             prevState = state;
@@ -412,7 +363,7 @@ int yylex()
         assert(n);
         yylex_move(n, size);
         if(isdigit(yylex_buf[0])) {
-            yylval.num = atoi(yylex_buf);
+            yylval.num = (unsigned)atol(yylex_buf);
             return REG;
         }
         yylval.str = yylex_buf;

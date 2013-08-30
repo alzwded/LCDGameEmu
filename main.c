@@ -34,9 +34,17 @@ int load(char const* fileName)
 
 static char const* fileName = "example/test-game.lge";
 
+void start()
+{
+    // init register machine
+    // setup window
+    // launch interpreter
+}
+
 void test()
 {
     load(fileName);
+    start();
     cleanup();
     jaklog(FATAL, JAK_STR|JAK_LN, "testing veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery long string");
 }
@@ -53,11 +61,8 @@ void args_load(char const* s)
 
 int main(int argc, char* argv[])
 {
-    //yydebug = 1;
     jaklog_set_level(TRACE);
 
-    // TODO actually implement front-end
-    // TODO open main window()
     HandleParameters(argc, argv);
 
     test();

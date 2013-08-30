@@ -1,195 +1,89 @@
-:Errata:
-in my 5e53b45..083e39c commit I meant the LEXER is finished, not the parser. Just wanted to get that out of the way.
+Organization of a game project
+==============================
 
-:BEGIN FILE:
-storage format:
+directory layout:
     game.lge                sprite descriptor and sprite graph (lgescript)
     game.assets/bg.png      background
     game.assets/*.png       sprites
 
 general:
-    a state runs on a 250 clock
+    a state runs on a 200ms clock
 
 bg.png:
-    400x400 pixels
+    size of the game's window determined by size of bg.png
 
-game.lge:
-.sprite
-<id>
-<image name>
-<x y coordinates>
+*.png:
+    sprite data. They should contain transparency information.
 
-.state
-<id>
-<on clock actions>
+Launching a game
+================
 
-Grammar
-=======
+lcdgameemu --load path/to/game.lge
+
+In the future there will be a number of options you can pass to the exe. To see them all you can lcdgameemu --usage .
+
+Right now I can tell you that there is the --debug-level option which sets the amount of stuff the exe prints out, the --load option which loads a game and --help option which is the same as --usage .
+
+game.lge Grammar
+================
 
 The language is called LGEScript. It's a hybrid declarative/iterative/state-machiney scripting language. Wrap your head around THAT!
 
 c.f. with parser.y the grammar section.
 
-file ::= file | item ;
-item ::= sprite | state ;
-
-sprite ::= ".sprite" INT PATH ;
-state ::= ".state" INT code ;
-
-code ::= codes ".end" ;
-codes ::= codes block | block ;
-block ::= block '&' statement | statement ;
-statement ::= set_statement
-              | conditional_statement
-              | transition_statement
-              ;
-
-PATH ::= *
-IDENT ::= [a-zA-Z_][a-zA-Z_0-9]*
-VAR ::= '$' INT | '$' IDENT ;
-set_statement ::= ".set" INT | ".reset" INT
-                | ".set" VAR arithmetic_expression
-                | ".reset" "all"
-                ;
-transition_statement ::= ".transition" INT ;
-
-isset_expression ::= "set" INT | "reset" INT ;
-
-arithmetic_expression ::= 'mul' operand operand
-                        | 'div' operand operand
-                        | 'mod' operand operand
-                        | 'sum' operand operand
-                        | 'sub' operand operand
-                        | INT
-                        ;
-
-operand ::= VAR | arithmetic_expression ;
-
-equality_expression ::= '=' operand operand
-                      | '!' operand operand
-                      | '<' operand operand
-                      | '>' operand operand
-                      ;
-
-rng_expression ::= '%.' INT ;
-
-atomic_condition ::= isset_expression
-                   | equality_expression
-                   | rng_expression
-                   ;
-
-condition ::= condition '&' atomic_condition | atomic_condition ;
-
-conditional_statement ::= ".if" condition ';' block ".fi" ;
-
 EXAMPLE FILE
 ============
 
-// this is not final and contains bugs ; work in progress
+c.f. examples/test-game.lge
 
-.sprite
-1
-player_left.png
+LGEScript
+=========
 
-.sprite
-2
-player_right.png
+The game logic is programmed using the internal scripting language, LGEScript.
 
-.sprite
-10
-player_bullet_left.png
-.sprite
-11
-player_bullet_left_2.png
+It's a very simple and light-hearted imperative and state-machine based language.
 
-.sprite
-20
-player_bullet_right.png
-.sprite
-21
-player_bullet_right_2.png
+States are defined in .state sections. They all have a unique id which will identify them.
 
-.sprite
-15
-player_bullet_left_explode.png
-.sprite
-16
-player_bullet_left_2_explode.png
-.sprite
-17
-player_bullet_left_3_explode.png
+Transitions between states are handled by .transition statements in the code section. When a transition is encountered, execution of the currnet state is halted and on the next clock cycle execution will begin in the state the transition was made towards.
 
-.sprite
-25
-player_bullet_right_explode.png
-.sprite
-26
-player_bullet_right_2_explode.png
-.sprite
-27
-player_bullet_right_3_explode.png
+There are a total of 100 internal registers you can use to store temporary data. They are WORD-sized. The are accessed using the $N syntax. The number 100 is completely arbitrary and in the future it may be configurable.
 
-.sprite
-117
-enemy_left_3.png
-.sprite
-116
-enemy_left_2.png
-.sprite
-115
-enemy_left.png
+There are also a number of predefined read-only registers, namely $left, $right, $up, $down, $fire, $alt, $start, $toggle, $upleft, $upright, $downleft, $downright . Virtually, these represent keys that may or may not be available to the user. By default they are mapped to <left>, <right>, <up>, <down> 1, 2, 0, 9, Q, P, A, L by default. In the future, they may also be mapped to a joystick or user configurable.
 
-.sprite
-227
-enemy_right_3.png
-.sprite
-226
-enemy_right_2.png
-.sprite
-225
-enemy_right.png
+Register data is written using the .set instruction. For example, .set $1 0 assigns the int value 0 to register 1. The lvalue needs to be writable. The left value can be a literal constant, another register, the state of a sprite, or an expression.
 
-.sprite
-256
-dead.png
+Data is read with comparisson operators: = (EQ), ! (NE), < (LT), > (GT), ~ (NOT). The state of a sprite is read using .set <number> or .reset <number>.
 
-.state
-0
-.set 1
-.if set 117 & = $0 0 ; .set $0 1 .fi
-if set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 fi
-if set 227 & = $1 0 ; set $1 1 fi
-if set 227 & = $1 1 ; reset 227 & set 226 & set $1 0 fi 
-if %.4 ; set 117 fi       // if 40% chance
-if %.4 ; set 227 fi
-if $right ; transition 1 fi
-if = $11 3 ; reset 13 & set $11 0 fi
-if = $11 2 ; reset 12 & set 13 & set $11 3 fi
-if = $11 1 ; reset 11 & set 12 & set $11 2 fi
-if = $11 0 & $fire ; set 11 & set $11 1 fi
-if set 11 & set 115 ; reset 115 & reset 11 & set 15 fi
-if set 12 & set 116 ; reset 116 & reset 12 & set 16 fi
-if set 13 & set 117 ; reset 117 & reset 13 & set 17 fi
-if reset 11 & set 115 ; reset all & set $5 0 & transition 5 fi
-.if set 225 ; .reset all & .set $5 0 & .transition 5 .fi
-.end
+Conditional statements are formed with the syntax: .if <condition> ; <action> .fi
 
-.state
-1
-reset 1
-set 2
-if 117 & = $0 0 ; set $0 1 fi
-if 117 & = $0 1 ; reset 117 & set 116 & set $0 0 fi
-if 227 & reset $1 ; set $1 fi
-if 227 & set $1 ; reset 227 & set 226 & reset $1 fi
-if %.4 ; set 117 fi       // if 40% chance
-if %.4 ; set 227 fi
-if $left ; transition 0 fi
-// idem as above logic
+Condition needs to be an expression that returns a value. Multiple conditions can be converged (i.e. AND-ed) using &, for example .if .set 1 & = $5 42 ; ... .fi .
 
-.state
-5
-if = mod $5 2 0 ; set 256 fi
-if = mod $5 2 1 ; reset 256 fi
-if = $5 5 ; transition 1 fi
-set $5 + $5 1
+Actions can be any arbitrary code block. A block is formed by chaining instructions with &. So a full if would be .if .set 1 & = $5 42 ; .set $5 0 ; .transition 2 .fi
+
+Sprites are either active or inactive. Their value is read and written using .set N and .reset N . A sprite is identified by its unique int id. There is also the special operation .reset .all which disables all sprites.
+
+Arithmetic operations are in polish notation (everything is in polish notation if you think about it). The valid operations are:
+
+| char | alternative name | description    |
+--------------------------------------------
+| +    | .sum             | addition       |
+| -    | .sub             | substraction   |
+| *    | .mul             | multiplication |
+| /    | .div             | int division   |
+|      | .mod             | modulo         |
+
+The operands can be other expressions or literal constants. There is no need for parentheses because of the polish notation.
+
+Use of whitespace is completely liberal, but, for the moment, because the lexer is written by hand, there needs to exist at least one piece of whitespace between tokens. (i.e. even though I'd love it to work with .if.set3&=$7 8;.transition9.fi , it doesn't. Also, history's taught us completely ignoring whitespace (like FORTRAN77) can lead to loss of human life because of a typo) <-- pretentious
+
+If you use the same chunk of code multiple times, you can store it in something we call a macro. This is defined in a .macro section, it has a unique int id and code. You can then call this macro using the .call N syntax. This will move execution to that macro and upon return execution will continue from where it left of.
+
+There is no notion of local/global/thread_local variables here. All you have to work with are the 100 r/w registers and the states of sprites you'd defined. So macros do not take parameters nor do the return values (not explicity, at least).
+
+Comments are delimited by # and EOL. # this is a comment
+This is not.
+
+The would have been no point to introduce the notion of "variables" or "stacks" since in that case, someone would've been able to actually implement decent quicky-games on this thing. That is not the point. The point is to force people to create emulations of bad chineso-british LCD games (like Nintendo's Game&Watch games, only bad and done in a hurry with 0 funding or research).
+
+For more info on the scripting language, examine the test-game.lge closely.

@@ -287,6 +287,15 @@ code_t* new_const(unsigned c)
     return ret;
 }
 
+code_t* new_not(code_t* left)
+{
+    code_t* ret = new_nop();
+    ret->type = ctNOT;
+    ret->left.code = left->first;
+    ret->left.code->top = ret;
+    return ret;
+}
+
 code_t* new_binfunc(code_type_t type, code_t* left, code_t* right)
 {
     code_t* ret = new_nop();

@@ -98,6 +98,7 @@ code_t* new_binfunc(code_type_t, code_t*, code_t*);
 code_t* new_rng(unsigned);
 code_t* new_if(code_t*, code_t*);
 code_t* new_call(unsigned);
+code_t* new_not(code_t*);
 void normalize_code(code_t**);
 
 // set the stream the lexer uses

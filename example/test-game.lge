@@ -100,12 +100,18 @@
 # idem as above logic
 .end
 
-.state
-5
+.state 5
 .if = .mod $5 2 0 ; .set 256 .fi
 .if = .mod $5 2 1 ; .reset 256 .fi
 .if = $5 5 ; .transition 1 .fi
 .set $5 + $5 1 & .nop
+.call 43
+.end
+
+.macro 43
+.if = $42 42 ;
+    .set 256
+.fi
 .end
 
 .state

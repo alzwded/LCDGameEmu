@@ -26,14 +26,9 @@ int yylex();
     sprite_t* sprite;
     state_t* state;
     code_t* code;
+    macro_t* macro;
 }
 
-/* optional, alternatively use for(YYNTOKENS) strncmp(yytname[i] + 1, s, strlen(s)) return yytoknum[i]
-%token <str> SPRITE ".sprite"
-%token <str> STATE ".state"
-%token <str> END ".end"
-for chars like '&' just return the char
-*/
 %token BAD_TOKEN
 %token <num> REG
 %token <str> PATH IDENT
@@ -43,12 +38,10 @@ for chars like '&' just return the char
 IDENT : [a-zA-Z_][a-zA-Z_0-9]*
 VAR : '$' INT | '$' IDENT ;*/
 
-/*%token <int> ASD; %token ASD*/
-/*%type <int> ASD ; %type ASD ; %left ASD */
-
 %type <sprite> sprite
 %type <state> state
-%type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition 
+%type <macro> macro
+%type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition call_statement
 
 %error-verbose
 %token_table
@@ -75,7 +68,15 @@ item : sprite {
 
         THEGAME->add_state(THEGAME, $1);
         }
+     | macro {
+        jaklog(TRACE, JAK_STR, "adding macro ");
+        jaklog(TRACE, JAK_TAB|JAK_NUM|JAK_LN, &$1->id);
+
+        THEGAME->add_macro(THEGAME, $1);
+        }
      ;
+
+macro: ".macro" INT code { $$ = new_macro($2, $3); }
 
 sprite : ".sprite" INT INT INT PATH { $$ = new_sprite($2, $3, $4, strdup($5)); } ;
 state : ".state" INT code { $$ = new_state($2, $3); } ;
@@ -129,7 +130,15 @@ statement : set_statement {
           | nop {
         $$ = $1;
         }
+          | call_statement {
+        $$ = $1;
+        }
           ;
+
+call_statement : ".call" INT {
+        $$ = new_call($2);
+        }
+        ;
 
 nop : ".nop" {
         $$ = new_nop();

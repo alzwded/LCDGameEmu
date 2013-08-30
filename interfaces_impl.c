@@ -23,6 +23,25 @@ int _pint_comparator(void const* a, void const* b)
     return *left < *right;
 }
 
+#define DECL_GAME_ADD_STUFF_METHOD(TYPE) \
+void _game_add_##TYPE(struct game_s* this, TYPE##_t * s) \
+{ \
+    if(this->n##TYPE##s >= this->c##TYPE##s) { \
+        this->TYPE##s = (TYPE##_t**)realloc(this->TYPE##s, sizeof(TYPE##_t*) * (this->c##TYPE##s << 1)); \
+        this->c##TYPE##s <<= 1; \
+    } \
+    this->TYPE##s[this->n##TYPE##s++] = s; \
+    qsort(this->TYPE##s, this->n##TYPE##s, sizeof(TYPE##_t*), _pint_comparator); \
+}
+
+#define GET_NAME_OF_GAME_ADD_STUFF_METHOD(TYPE) \
+    _game_add_##TYPE
+
+DECL_GAME_ADD_STUFF_METHOD(state)
+DECL_GAME_ADD_STUFF_METHOD(sprite)
+DECL_GAME_ADD_STUFF_METHOD(macro)
+
+/*
 void _game_add_state(struct game_s* this, state_t* s)
 {
     if(this->nstates >= this->cstates) {
@@ -42,16 +61,19 @@ void _game_add_sprite(struct game_s* this, sprite_t* s)
     this->sprites[this->nsprites++] = s;
     qsort(this->sprites, this->nsprites, sizeof(sprite_t*), _pint_comparator);
 }
+*/
 
 game_t* new_game()
 {
     game_t* ret = (game_t*)malloc(sizeof(game_t));
-    ret->csprites = ret->cstates = 2;
-    ret->nsprites = ret->nstates = 0;
+    ret->csprites = ret->cstates = ret->cmacros = 2;
+    ret->nsprites = ret->nstates = ret->nmacros = 0;
     ret->sprites = (sprite_t**)malloc(2 * sizeof(sprite_t*));
     ret->states = (state_t**)malloc(2 * sizeof(state_t*));
-    ret->add_state = &_game_add_state;
-    ret->add_sprite = &_game_add_sprite;
+    ret->macros = (macro_t**)malloc(2 * sizeof(macro_t*));
+    ret->add_state = &GET_NAME_OF_GAME_ADD_STUFF_METHOD(state);
+    ret->add_sprite = &GET_NAME_OF_GAME_ADD_STUFF_METHOD(sprite);
+    ret->add_macro = &GET_NAME_OF_GAME_ADD_STUFF_METHOD(macro);
     return ret;
 }
 
@@ -64,6 +86,9 @@ void delete_game(game_t** game)
     }
     for(i = 0; i < (*game)->nstates; ++i) {
         delete_state( &(*game)->states[i] );
+    }
+    for(i = 0; i < (*game)->nmacros; ++i) {
+        delete_macro( &(*game)->macros[i] );
     }
     free(*game);
     *game = NULL;
@@ -83,6 +108,14 @@ void delete_state(state_t** state)
     free(*state);
     delete_code( &(*state)->code );
     *state = NULL;
+}
+
+void delete_macro(macro_t** macro)
+{
+    if(!macro || !*macro) return;
+    free(*macro);
+    delete_code( &(*macro)->code );
+    *macro = NULL;
 }
 
 char const* strct(code_type_t type)
@@ -113,6 +146,7 @@ char const* strct(code_type_t type)
     TYPE_TO_STRING(ctNOT);
     TYPE_TO_STRING(ctRNG);
     TYPE_TO_STRING(ctIF);
+    TYPE_TO_STRING(ctCALL);
     }
 #undef TYPE_TO_STRING
     return "";
@@ -176,6 +210,14 @@ sprite_t* new_sprite(unsigned id, unsigned x, unsigned y, char* path)
 state_t* new_state(unsigned id, code_t* code)
 {
     state_t* ret = (state_t*)malloc(sizeof(state_t));
+    ret->id = id;
+    ret->code = code;
+    return ret;
+}
+
+macro_t* new_macro(unsigned id, code_t* code)
+{
+    macro_t* ret = (macro_t*)malloc(sizeof(macro_t));
     ret->id = id;
     ret->code = code;
     return ret;
@@ -285,5 +327,13 @@ code_t* new_rng(int p)
 code_t* new_if(code_t* left, code_t* right)
 {
     code_t* ret = new_binfunc(ctIF, left, right);
+    return ret;
+}
+
+code_t* new_call(unsigned id)
+{
+    code_t* ret = new_nop();
+    ret->type = ctCALL;
+    ret->left.num = id;
     return ret;
 }

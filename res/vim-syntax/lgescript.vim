@@ -5,7 +5,7 @@
 :setlocal iskeyword+=%
 :syntax case match
 
-:syntax keyword lgescript_kw .set .reset .transition .sum .sub .mod .mul .div .nop .call
+:syntax keyword lgescript_kw .set .reset .transition .sum .sub .mod .mul .div .nop .call .all
 :syntax keyword lgescript_section .sprite .state .macro .sound .end
 
 :syntax match lgescript_ident /\<\$[a-zA-Z0-9_]*\>/  contains=lgrscript_num

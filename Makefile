@@ -19,7 +19,7 @@ parser.c: parser.y
 	$(YACC)  -o parser.c  $(YACCOPTS) -- parser.y
 
 clean:
-	rm -f parser.dot parser.output parser.c *.o $(EXE)
+	rm -f parser.dot parser.output parser.c *.o $(EXE) trace log lcdgameemu.log lcdgameemu.trace
 
 all: clean $(EXE)
 

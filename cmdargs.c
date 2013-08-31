@@ -14,13 +14,15 @@ typedef struct Option_s {
     cmdargs_callback_t Callback;
 } Option;
 
-void GetHelp(char const*);
+void PrintHelp(char const*);
+void PrintVersion(char const*);
 
 static const Option Options[] = {
     { "debug-level", 'd', YES, "set the debug level [-2..3]", &args_set_debug_level },
     { "load", 'l', YES, "load a game!", &args_load },
-    { "help", 'h', NO, "print this message", &GetHelp },
-    { "usage", '\0', NO, "print this message", &GetHelp },
+    { "help", 'h', NO, "print this message", &PrintHelp },
+    { "usage", '\0', NO, "print this message", &PrintHelp },
+    { "version", 'V', NO, "print the current version", &PrintVersion },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
 };
 
@@ -137,11 +139,26 @@ void HandleParameters(int argc, char* argv[])
     }
 }
 
-void GetHelp(char const* _)
+char const* _GetVersion()
+{
+#ifndef LGEVERSION
+# warning "LGEVERSION not defined!"
+# define LGEVERSION "<unknown version>"
+#endif
+    return LGEVERSION;
+}
+
+void PrintVersion(char const* _)
+{
+    printf("lcdgameemu %s\n", _GetVersion());
+    exit(255);
+}
+
+void PrintHelp(char const* _)
 {
     const Option* p = &Options[0];
 
-    printf("lcdgameemu\noptions:\n");
+    printf("lcdgameemu %s\noptions:\n", _GetVersion());
 
     for(; p->LongName != NULL || p->ShortName != '\0'; ++p)
     {

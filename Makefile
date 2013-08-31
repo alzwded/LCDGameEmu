@@ -1,10 +1,11 @@
+LGEVERSION = '"0.1-pre"'
 YACC = bison
 YACCOPTS = --graph -k -v
 MAINOBJ = main.o
 EXE = lcdgameemu
 OBJS = parser.o interfaces_impl.o log.o cmdargs.o
 CC = gcc
-COPTS = -g -c -I. -Wall
+COPTS = -g -c -I. -Wall -DLGEVERSION=$(LGEVERSION)
 LD = gcc
 LDOPTS = 
 
@@ -19,3 +20,8 @@ parser.c: parser.y
 
 clean:
 	rm -f parser.dot parser.output parser.c *.o $(EXE)
+
+all: clean $(EXE)
+
+.PHONY: clean
+.PHONY: all

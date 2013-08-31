@@ -121,3 +121,51 @@ Clock
 -----
 
 The clock visible to the outside world is the internal one that runs at 100/200ms intervals. State transitions happen at this interval. Upon a transition, the code assigned to that transition will trigger. The internal code interpretation is done "instantaneuously", i.e. at the host's CPU speed. This emulated the hard-wired behaviour many of these things seem to have.
+
+On the communication between the GUI and the backend
+====================================================
+
+BackEnd
+-------
+
+The entity BackEnd will contain:
+* the emulated machine data instance (as described above)
+* the interpreter
+* the BackEndGameData
+* a callback that updates the internal state: set_input(int reg, BOOL state)
+* a callback to trigger a clock impulse to start the interpreter for one cycle: onclock()
+* query functions:
+    - get_max_num_sprites(int& nsprites)
+    - get_active_sprites(int& sprites[], int& nsprites), memory should be preallocated
+    - get_active_sound(int& id) // not implemented, TODO v2
+* an init method: init_machine(THEGAME)
+
+### BackEndGameData
+
+The BackEndGameData contains, at a minimum of:
+* the code assigned to each state, stored in an associative array or state_id - state_code
+* the stored macros in an AssocArray
+* the current state (state pointer)
+* the macro call stack
+* query methods:
+    - code_t* get_state_code(state_id)
+    - code_t* get_macro_code(macro_id)
+    - state_id get_current_state()
+    - stack_t* get_call_stack()
+
+### The interpreter
+
+Interface:
+* start()
+* (-) call_macro(macro_id)
+
+GUI
+---
+
+The entity GUI will contain:
+* the main rendering window
+* an associative array between sprite unique ids and the graphic they represent
+* host input handling
+* sound engine (not implemented, TODO v2)
+* an init procedure: init_gui(game_t* THEGAME)
+* a 100ms clock() that triggers the BackEnd's interpreter

@@ -1,43 +1,53 @@
 #include "stack.h"
 
 struct _stack_data {
-    size_t capacity;
-    size_t size;
-    void** elements;
+    struct _stack_data* prev;
+    void const* data;
 };
 
 void _stack_push_impl(struct stack_s* this, void const* a)
 {
-    struct _stack_data* d = (struct _stack_data*)this->_data;
-    if(d->size >= d->capacity) {
-        d->elements = (void**)realloc(d->elements, d->capacity << 1);
-        d->capacity <<= 1;
+    struct _stack_data* d = (struct _stack_data*)malloc(sizeof(struct _stack_data));
+
+    if(this->_data) {
+        struct _stack_data* prev = (struct _stack_data*)this->_data;
+        d->prev = prev;
+    } else {
+        d->prev = NULL;
     }
-    d->elements[d->size++] = (void*)a;
+
+    this->_data = d;
+    d->data = a;
 }
 
 void* _stack_pop_impl(struct stack_s* this)
 {
-    struct _stack_data* d = (struct _stack_data*)this->_data;
-    if(d->size == 0) return NULL;
-    return d->elements[d->size--];
+    if(this->_data) {
+        struct _stack_data* d = (struct _stack_data*)this->_data;
+        void* ret = (void*)d->data;
+        this->_data = d->prev;
+    } else {
+        return NULL;
+    }
 }
 
 size_t _stack_size_impl(struct stack_s* this)
 {
     struct _stack_data* d = (struct _stack_data*)this->_data;
-    return d->size;
+    size_t size = 0;
+
+    while(d) {
+        size++;
+        d = d->prev;
+    }
+
+    return size;
 }
 
 stack_t* new_stack()
 {
     stack_t* ret = (stack_t*)malloc(sizeof(stack_t));
-    ret->_data = (struct _stack_data*)malloc(sizeof(struct _stack_data));
-
-    struct _stack_data* d = (struct _stack_data*)ret->_data;
-    d->capacity = 2;
-    d->size = 0;
-    d->elements = (void**)malloc(sizeof(void*) * 2);
+    ret->_data = NULL;
 
     ret->push = &_stack_push_impl;
     ret->pop = &_stack_pop_impl;
@@ -50,9 +60,10 @@ void delete_stack(stack_t** this)
 {
     if(!*this) return;
     struct _stack_data* d = (struct _stack_data*)(*this)->_data;
-    if(d) {
-        if(d->elements) free(d->elements);
+    while(d) {
+        struct _stack_data* prev = d->prev;
         free(d);
+        d = prev;
     }
     free(*this);
     *this = NULL;

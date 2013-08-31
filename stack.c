@@ -1,4 +1,5 @@
 #include "stack.h"
+#include <assert.h>
 
 struct _stack_data {
     struct _stack_data* prev;
@@ -8,6 +9,7 @@ struct _stack_data {
 void _stack_push_impl(struct stack_s* this, void const* a)
 {
     struct _stack_data* d = (struct _stack_data*)malloc(sizeof(struct _stack_data));
+    assert(this);
 
     if(this->_data) {
         struct _stack_data* prev = (struct _stack_data*)this->_data;
@@ -22,6 +24,7 @@ void _stack_push_impl(struct stack_s* this, void const* a)
 
 void* _stack_pop_impl(struct stack_s* this)
 {
+    assert(this);
     if(this->_data) {
         struct _stack_data* d = (struct _stack_data*)this->_data;
         void* ret = (void*)d->data;
@@ -35,6 +38,8 @@ size_t _stack_size_impl(struct stack_s* this)
 {
     struct _stack_data* d = (struct _stack_data*)this->_data;
     size_t size = 0;
+
+    assert(this);
 
     while(d) {
         size++;

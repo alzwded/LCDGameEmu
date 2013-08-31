@@ -29,6 +29,7 @@ void* _stack_pop_impl(struct stack_s* this)
         struct _stack_data* d = (struct _stack_data*)this->_data;
         void* ret = (void*)d->data;
         this->_data = d->prev;
+        return ret;
     } else {
         return NULL;
     }

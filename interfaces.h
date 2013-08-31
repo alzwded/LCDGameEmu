@@ -1,7 +1,7 @@
 #ifndef INTERFACES_H
 #define INTERFACES_H
 
-struct FILE;
+#include <stdio.h>
 
 typedef struct {
     unsigned id, x, y;

@@ -1,6 +1,7 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
+#include <stdlib.h>
 #include "interfaces.h"
 #include "stack.h"
 #include "vector.h"
@@ -39,5 +40,6 @@ typedef struct {
 } machine_t;
 
 machine_t* new_machine(game_t const*);
+void delete_machine(machine_t**);
 
 #endif

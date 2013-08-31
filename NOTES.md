@@ -4,19 +4,19 @@ Organization of a game project
 directory layout:
 
 | file                | description                                    |
-------------------------------------------------------------------------
+|---------------------|------------------------------------------------|
 | game.lge            | sprite descriptor and sprite graph (lgescript) |
 | game.assets/bg.png  | background                                     |
 | game.assets/*.png   | sprites                                        |
 
 general:  
-    a state runs on a 200ms clock
+* a state runs on a 200ms clock
 
 bg.png:  
-    size of the game's window determined by size of bg.png
+* size of the game's window determined by size of bg.png
 
 *.png:  
-    sprite data. They should contain transparency information.
+* sprite data. They should contain transparency information.
 
 Launching a game
 ================
@@ -71,7 +71,7 @@ Sprites are either active or inactive. Their value is read and written using .se
 Arithmetic operations are in polish notation (everything is in polish notation if you think about it). The valid operations are:
 
 | char | alternative name | description    |
---------------------------------------------
+|------|------------------|----------------|
 | +    | .sum             | addition       |
 | -    | .sub             | substraction   |
 | *    | .mul             | multiplication |

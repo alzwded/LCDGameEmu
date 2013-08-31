@@ -23,7 +23,7 @@
 
 :syntax match lgescript_num /\<[0-9]*\>/
 
-:syntax region lgescript_ifblock matchgroup=lgescript_ifblock_extremities start=/.if/ end=/.fi/ contains=ALL transparent fold
+:syntax region lgescript_ifblock matchgroup=lgescript_ifblock_extremities start=/\.if/ end=/\.fi/ contains=ALL transparent fold
 
 :highlight link lgescript_section Function
 :highlight link lgescript_kw Statement

@@ -5,18 +5,24 @@ directory layout:
 
 | file                | description                                    |
 |---------------------|------------------------------------------------|
-| game.lge            | sprite descriptor and sprite graph (lgescript) |
+| game.lge            | sprite descriptor and state graph (lgescript)  |
 | game.assets/bg.png  | background                                     |
 | game.assets/*.png   | sprites                                        |
 
 general:  
-* a state runs on a 200ms clock
+* state transitions happen on a 100ms clock
+
+game.lge:
+* the game descriptor
+* contains definitions of sprites, sounds (not implemented, TODO v2), states and macros
+* refer to LGEScript
 
 bg.png:  
+* the backdrop that will be displayed throughout the game
 * size of the game's window determined by size of bg.png
 
 *.png:  
-* sprite data. They should contain transparency information.
+* sprite data. They should contain transparency information (png can do that)
 
 Launching a game
 ================
@@ -127,7 +133,7 @@ Clock
 
 The clock visible to the outside world is the internal one that runs at 100/200ms intervals. State transitions happen at this interval. Upon a transition, the code assigned to that transition will trigger. The internal code interpretation is done "instantaneuously", i.e. at the host's CPU speed. This emulated the hard-wired behaviour many of these things seem to have.
 
-On the communication between the GUI and the backend
+On the communication between the GUI and the BackEnd
 ====================================================
 
 BackEnd
@@ -173,4 +179,4 @@ The entity GUI will contain:
 * host input handling
 * sound engine (not implemented, TODO v2)
 * an init procedure: init_gui(game_t* THEGAME)
-* a 100ms clock() that triggers the BackEnd's interpreter
+* a 100ms clock that triggers the BackEnd's interpreter

@@ -4,10 +4,10 @@
 #include <stdlib.h>
 
 typedef struct stack_s {
+    void* _data;
     void (*push)(struct stack_s*, void const*);
     void* (*pop)(struct stack_s*);
     size_t (*size)(struct stack_s*);
-    void* _data;
 } stack_t;
 
 stack_t* new_stack();

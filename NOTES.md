@@ -58,7 +58,7 @@ States are defined in .state sections. They all have a unique id which will iden
 
 Transitions between states are handled by .transition statements in the code section. When a transition is encountered, execution of the currnet state is halted and on the next clock cycle execution will begin in the state the transition was made towards.
 
-There are a total of 100 internal registers you can use to store temporary data. They are WORD-sized. The are accessed using the $N syntax. The number 100 is completely arbitrary and in the future it may be configurable.
+There are a total of 100 internal registers you can use to store temporary data. They are BYTE-sized. The are accessed using the $N syntax. The number 100 is completely arbitrary and in the future it may be configurable.
 
 There are also a number of predefined read-only registers, namely $left, $right, $up, $down, $fire, $alt, $start, $toggle, $upleft, $upright, $downleft, $downright . Virtually, these represent keys that may or may not be available to the user. By default they are mapped to <left>, <right>, <up>, <down> 1, 2, 0, 9, Q, P, A, L by default. In the future, they may also be mapped to a joystick or user configurable.
 
@@ -107,7 +107,7 @@ This describes the emulated machine your code runs on.
 Registers
 ---------
 
-$0-$99: 100 general purpose WORD sized unsigned registers. This means that normally you should be able to store values from 0..2^32-1. They are accessed using $N from code.
+$0-$99: 100 general purpose BYTE sized unsigned registers. This means that normally you should be able to store values from 0..2^8-1. They are accessed using $N from code.
 
 Instruction pointer: Internal register. This is literally a code_t* that stores the currently executing instruction. After a clock cycle / transition, this is set to the first instruction to be executed. It is set to the first instruction of the current state upon a clock pulse.
 

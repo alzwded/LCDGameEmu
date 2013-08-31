@@ -1,0 +1,16 @@
+#ifndef STACK_H
+#define STACK_H
+
+#include <stdlib.h>
+
+typedef struct stack_s {
+    void (*push)(struct stack_s*, void const*);
+    void* (*pop)(struct stack_s*);
+    size_t (*size)(struct stack_s*);
+    void* _data;
+} stack_t;
+
+stack_t* new_stack();
+void delete_stack(stack_t**);
+
+#endif

@@ -2,23 +2,28 @@ Organization of a game project
 ==============================
 
 directory layout:
-    game.lge                sprite descriptor and sprite graph (lgescript)
-    game.assets/bg.png      background
-    game.assets/*.png       sprites
 
-general:
+| file                | description                                    |
+------------------------------------------------------------------------
+| game.lge            | sprite descriptor and sprite graph (lgescript) |
+| game.assets/bg.png  | background                                     |
+| game.assets/*.png   | sprites                                        |
+
+general:  
     a state runs on a 200ms clock
 
-bg.png:
+bg.png:  
     size of the game's window determined by size of bg.png
 
-*.png:
+*.png:  
     sprite data. They should contain transparency information.
 
 Launching a game
 ================
 
+```
 lcdgameemu --load path/to/game.lge
+```
 
 In the future there will be a number of options you can pass to the exe. To see them all you can lcdgameemu --usage .
 

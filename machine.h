@@ -27,16 +27,16 @@ typedef enum {
     HI
 } bit_state_t;
 
-typedef struct {
+typedef struct machine_s {
     reg_t registers[100];
     bit_t input;
     unsigned current_state;
     stack_t* stack;
     vector_t* sprite_state;
 
-    void (*onclock)();
-    void (*set_input)(bit_t, bit_state_t);
-    void (*get_active_sprites)(unsigned*, unsigned*);
+    void (*onclock)(struct machine_s*);
+    void (*set_input)(struct machine_s*, bit_t, bit_state_t);
+    void (*get_active_sprites)(struct machine_s*, unsigned*, unsigned*);
 } machine_t;
 
 machine_t* new_machine(game_t const*);

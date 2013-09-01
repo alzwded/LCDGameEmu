@@ -4,11 +4,15 @@
 #include "interfaces.h"
 #include "log.h"
 #include "cmdargs.h"
+#include "machine.h"
 
 game_t* THEGAME;
+static machine_t* g_machine;
+
 
 void cleanup()
 {
+    delete_machine(&g_machine);
     delete_game(&THEGAME);
 }
 
@@ -34,19 +38,23 @@ int load(char const* fileName)
 
 static char const* fileName = "example/test-game.lge";
 
+void init()
+{
+    g_machine = new_machine(THEGAME);
+    // TODO init gui
+}
+
 void start()
 {
-    // init register machine
-    // setup window
-    // launch interpreter
+    // TODO launch timer which calls g_machine->onclock(g_machine)
 }
 
 void test()
 {
     load(fileName);
+    init();
     start();
     cleanup();
-    jaklog(FATAL, JAK_STR|JAK_LN, "testing veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery long string");
 }
 
 void args_set_debug_level(char const* s)

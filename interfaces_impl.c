@@ -19,11 +19,11 @@ void parser_set_stream(FILE* f)
 // relies on the fact that all of these have an int id as the first member
 static int _pint_comparator(void const* a, void const* b)
 {
-    unsigned* left = (unsigned*)a;
-    unsigned* right = (unsigned*)b;
+    unsigned** left = (unsigned**)a;
+    unsigned** right = (unsigned**)b;
 
-    if(*left == *right) return 0;
-    else if(*left < *right) return -1;
+    if(**left == **right) return 0;
+    else if(**left < **right) return -1;
     else return 1;
 }
 

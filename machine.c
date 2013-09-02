@@ -9,16 +9,16 @@ static int _state_comp(void const* a, void const* b)
     assert(a);
     assert(b);
     unsigned* first = (unsigned*)a;
-    state_t* second = (state_t*)b;
-    if(*first == second->id) return 0;
-    else if(*first > second->id) return 1;
+    state_t** second = (state_t**)b;
+    if(*first == (*second)->id) return 0;
+    else if(*first > (*second)->id) return 1;
     else return -1;
 }
 
 static code_t* _get_code_of(machine_t* this, unsigned stateId)
 {
-    code_t** ret = (code_t**)bsearch(&stateId, this->game->states, this->game->nstates, sizeof(state_t), _state_comp);
-    return *ret;
+    state_t** found = (state_t**)bsearch(&stateId, this->game->states, this->game->nstates, sizeof(state_t*), _state_comp);
+    return (*found)->code;
 }
 
 static void _machine_onclock_impl(struct machine_s* this)

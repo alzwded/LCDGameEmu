@@ -19,15 +19,15 @@ static int _sprite_id_comp(void const* key, void const* a)
     assert(key);
     assert(a);
     unsigned* left = (unsigned*)key;
-    sprite_t* right = (sprite_t*)a;
-    if(*left < right->id) return -1;
-    else if(*left == right->id) return 0;
+    sprite_t** right = (sprite_t**)a;
+    if(*left < (*right)->id) return -1;
+    else if(*left == (*right)->id) return 0;
     else return 1;
 }
 
 static size_t _get_sprite_index(machine_t* this, unsigned id)
 {
-    sprite_t** found = (sprite_t**)bsearch(&id, this->game->sprites, this->game->nsprites, sizeof(sprite_t), &_sprite_id_comp);
+    sprite_t** found = (sprite_t**)bsearch(&id, this->game->sprites, this->game->nsprites, sizeof(sprite_t*), &_sprite_id_comp);
     return found - this->game->sprites;
 }
 

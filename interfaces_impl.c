@@ -22,7 +22,9 @@ int _pint_comparator(void const* a, void const* b)
     unsigned* left = (unsigned*)a;
     unsigned* right = (unsigned*)b;
 
-    return *left < *right;
+    if(*left == *right) return 0;
+    else if(*left < *right) return -1;
+    else return 1;
 }
 
 #define DECL_GAME_ADD_STUFF_METHOD(TYPE) \

@@ -1,9 +1,31 @@
 #include "machine.h"
+#include "interpreter.h"
 #include <assert.h>
 #include <memory.h>
+#include <stdlib.h>
 
-void _machine_onclock_impl(struct machine_s* this)
+static int _state_comp(void const* a, void const* b)
 {
+    assert(a);
+    assert(b);
+    unsigned* first = (unsigned*)a;
+    state_t* second = (state_t*)b;
+    if(*first == second->id) return 0;
+    else if(*first > second->id) return 1;
+    else return -1;
+}
+
+static code_t* _get_code_of(machine_t* this, unsigned stateId)
+{
+    code_t* ret = (code_t*)bsearch(&stateId, this->game->states, this->game->nstates, sizeof(state_t), _state_comp);
+    return ret;
+}
+
+static void _machine_onclock_impl(struct machine_s* this)
+{
+    assert(this);
+    code_t* code = _get_code_of(this, this->current_state);
+    interpreter_eval(this, code);
 }
 
 void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)

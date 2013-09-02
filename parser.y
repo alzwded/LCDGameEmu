@@ -126,8 +126,8 @@ transition_statement : ".transition" INT { $$ = new_transition($2); }
 
 isset_expression : ".set" INT { $$ = new_is_sprite($2, ssON); }
                  | ".reset" INT { $$ = new_is_sprite($2, ssOFF); }
-                 | ".set" VAR { $$ = new_is_var($2, ssON); }
-                 | ".reset" VAR { $$ = new_is_var($2, ssOFF); }
+                 | ".set" IDENT { $$ = new_is_var(new_ident(strdup($2)), ssON); }
+                 | ".reset" IDENT { $$ = new_is_var(new_ident(strdup($2)), ssOFF); }
                  ;
 
 arithmetic_expression : ".mul" operand operand { $$ = new_binfunc(ctMUL, $2, $3); }

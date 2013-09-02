@@ -1,5 +1,6 @@
 #include "interpreter.h"
 #include "interfaces.h"
+#include "log.h"
 #include <assert.h>
 #include <memory.h>
 
@@ -65,6 +66,65 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             break;
         case ctISSPRITE:
             this->stack->push(this->stack, this->sprite_state->get(this->sprite_state, _get_sprite_index(this, ip->left.num)));
+            break;
+        case ctCONST:
+            this->stack->push(this->stack, (void const*)ip->left.num);
+            break;
+        case ctMUL: {
+            unsigned left;
+            unsigned right;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            left = (unsigned)this->stack->pop(this->stack);
+            right = (unsigned)this->stack->pop(this->stack);
+            this->stack->push(this->stack, (void const*)(left * right));
+            break; }
+        case ctDIV: {
+            unsigned left;
+            unsigned right;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            left = (unsigned)this->stack->pop(this->stack);
+            right = (unsigned)this->stack->pop(this->stack);
+            this->stack->push(this->stack, (void const*)(left / right));
+            break; }
+        case ctSUM: {
+            unsigned left;
+            unsigned right;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            left = (unsigned)this->stack->pop(this->stack);
+            right = (unsigned)this->stack->pop(this->stack);
+            this->stack->push(this->stack, (void const*)(left + right));
+            break; }
+        case ctSUB: {
+            unsigned left;
+            unsigned right;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            left = (unsigned)this->stack->pop(this->stack);
+            right = (unsigned)this->stack->pop(this->stack);
+            this->stack->push(this->stack, (void const*)(left - right));
+            break; }
+        case ctMOD: {
+            unsigned left;
+            unsigned right;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            left = (unsigned)this->stack->pop(this->stack);
+            right = (unsigned)this->stack->pop(this->stack);
+            this->stack->push(this->stack, (void const*)(left % right));
+            break; }
+        case ctISVAR:
+        case ctRNG:
+        case ctIF:
+        case ctEQ:
+        case ctNE:
+        case ctLT:
+        case ctGT:
+        case ctNOT:
+        case ctCALL:
+            jaklog(FATAL, JAK_STR|JAK_LN, "Interpreter: TODO instruction not implemented");
             break;
         }
         INTERPRETER_NEXTI();

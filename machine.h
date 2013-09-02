@@ -22,25 +22,25 @@ typedef enum {
     DOWNLEFT = 0x010000000000,
     DOWNRIGHT = 0x100000000000,
     LAST_BIT = 0x1000000000000
-} bit_t;
+} input_bit_t;
 
-typedef unsigned bit_field_t;
+typedef unsigned input_bit_field_t;
 typedef enum {
     LO = 0,
     HI = 1
-} bit_state_t;
+} input_bit_state_t;
 
 typedef struct machine_s {
     reg_t registers[100];
-    bit_field_t input;
+    input_bit_field_t input;
     unsigned current_state;
     stack_t* stack;
     vector_t* sprite_state;
     game_t const* game;
 
     void (*onclock)(struct machine_s*);
-    void (*set_input)(struct machine_s*, bit_t, bit_state_t);
-    void (*set_input_mask)(struct machine_s*, bit_field_t, bit_state_t);
+    void (*set_input)(struct machine_s*, input_bit_t, input_bit_state_t);
+    void (*set_input_mask)(struct machine_s*, input_bit_field_t, input_bit_state_t);
     void (*get_active_sprites)(struct machine_s*, vector_t*, unsigned*);
 } machine_t;
 

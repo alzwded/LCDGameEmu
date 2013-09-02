@@ -6,7 +6,7 @@ void _machine_onclock_impl(struct machine_s* this)
 {
 }
 
-void _machine_set_input_impl(struct machine_s* this, bit_t bit, bit_state_t state)
+void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
 {
     assert(this);
     assert(state == HI || state == LO);
@@ -16,7 +16,7 @@ void _machine_set_input_impl(struct machine_s* this, bit_t bit, bit_state_t stat
     this->input |= (state << bit);
 }
 
-void _machine_set_input_mask_impl(struct machine_s* this, bit_field_t mask, bit_state_t state)
+void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask, input_bit_state_t state)
 {
     assert(this);
     assert(state == HI || state == LO);

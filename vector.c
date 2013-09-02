@@ -1,33 +1,41 @@
 #include "vector.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <memory.h>
 
 struct _vector_data {
     void** data;
     size_t capacity, size;
 };
 
+size_t _vector_size_impl(struct vector_s* this)
+{
+    assert(this);
+    struct _vector_data* obj = (struct _vector_data*)this->_data;
+    assert(obj);
+    return obj->size;
+}
+
 void _vector_resize_impl(struct vector_s* obj, size_t const new_size)
 {
-    struct _vector_data* this = (struct _vector_data*)obj->_data;
     assert(obj);
+    struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
     if(this->size != new_size && this->capacity < new_size) {
         this->data = (void**)realloc(this->data, sizeof(void*) * new_size);
         this->capacity = new_size;
     }
     if(new_size > this->size) {
-        size_t i = this->size;
-        for(; i < new_size; ++i) {
-            this->data[i] = NULL;
-        }
+        memset(&this->data[this->size], 0, new_size - this->size);
     }
     this->size = new_size;
 }
 
 void _vector_append_impl(struct vector_s* obj, void const* a)
 {
-    struct _vector_data* this = (struct _vector_data*)obj->_data;
     assert(obj);
+    struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
     if(this->size >= this->capacity) {
         this->data = (void**)realloc(this->data, sizeof(void*) * this->capacity << 1);
         this->capacity <<= 1;
@@ -37,8 +45,9 @@ void _vector_append_impl(struct vector_s* obj, void const* a)
 
 void _vector_set_impl(struct vector_s* obj, size_t const idx, void const* a)
 {
-    struct _vector_data* this = (struct _vector_data*)obj->_data;
     assert(obj);
+    struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
     if(idx >= this->capacity) {
         this->data = (void**)realloc(this->data, sizeof(void*) * this->capacity << 1);
         this->capacity <<= 1;
@@ -61,6 +70,7 @@ void* _vector_get_impl(struct vector_s* obj, size_t const idx)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
     if(idx >= this->size) return NULL;
     return this->data[idx];
 }
@@ -69,6 +79,7 @@ void** _vector_array_impl(struct vector_s* obj)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
     return this->data;
 }
 
@@ -92,15 +103,12 @@ vector_t* new_vector()
 
 vector_t* new_vector_of(size_t initialCapacity)
 {
-    size_t i;
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
     struct _vector_data* d = (struct _vector_data*)malloc(sizeof(struct _vector_data));
     ret->_data = d;
     d->capacity = d->size = initialCapacity;
     d->data = (void**)malloc(sizeof(void*) * initialCapacity);
-    for(i = 0; i < initialCapacity; ++i) {
-        d->data[i] = NULL;
-    }
+    memset(d->data, 0, initialCapacity);
 
     ret->resize = _vector_resize_impl;
     ret->append = _vector_append_impl;

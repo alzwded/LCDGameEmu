@@ -5,6 +5,7 @@
 
 typedef struct vector_s {
     void* _data;
+    size_t (*size)(struct vector_s*);
     void (*resize)(struct vector_s*, size_t const);
     void (*append)(struct vector_s*, void const*);
     void (*set)(struct vector_s*, size_t const, void const*);

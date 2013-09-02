@@ -27,7 +27,7 @@ void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask
 }
 
 
-void _machine_get_active_sprites_impl(struct machine_s* this, vector_t* sprites, unsigned* nsprites)
+void _machine_get_active_sprites_impl(struct machine_s* this, vector_t* sprites)
 {
     assert(this);
     size_t i;

@@ -41,7 +41,7 @@ typedef struct machine_s {
     void (*onclock)(struct machine_s*);
     void (*set_input)(struct machine_s*, input_bit_t, input_bit_state_t);
     void (*set_input_mask)(struct machine_s*, input_bit_field_t, input_bit_state_t);
-    void (*get_active_sprites)(struct machine_s*, vector_t*, unsigned*);
+    void (*get_active_sprites)(struct machine_s*, vector_t*);
 } machine_t;
 
 machine_t* new_machine(game_t const*);

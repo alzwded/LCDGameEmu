@@ -6,7 +6,7 @@ struct _stack_data {
     void const* data;
 };
 
-void _stack_push_impl(struct stack_s* this, void const* a)
+static void _stack_push_impl(struct stack_s* this, void const* a)
 {
     struct _stack_data* d = (struct _stack_data*)malloc(sizeof(struct _stack_data));
     assert(this);
@@ -22,7 +22,7 @@ void _stack_push_impl(struct stack_s* this, void const* a)
     d->data = a;
 }
 
-void* _stack_pop_impl(struct stack_s* this)
+static void* _stack_pop_impl(struct stack_s* this)
 {
     assert(this);
     if(this->_data) {
@@ -35,7 +35,7 @@ void* _stack_pop_impl(struct stack_s* this)
     }
 }
 
-size_t _stack_size_impl(struct stack_s* this)
+static size_t _stack_size_impl(struct stack_s* this)
 {
     struct _stack_data* d = (struct _stack_data*)this->_data;
     size_t size = 0;

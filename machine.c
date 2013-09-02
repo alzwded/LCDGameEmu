@@ -28,7 +28,7 @@ static void _machine_onclock_impl(struct machine_s* this)
     interpreter_eval(this, code);
 }
 
-void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
+static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
 {
     assert(this);
     assert(state == HI || state == LO);
@@ -38,7 +38,7 @@ void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_
     this->input |= (state << bit);
 }
 
-void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask, input_bit_state_t state)
+static void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask, input_bit_state_t state)
 {
     assert(this);
     assert(state == HI || state == LO);
@@ -48,8 +48,7 @@ void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask
     if(state) this->input |= mask;
 }
 
-
-void _machine_get_active_sprites_impl(struct machine_s* this, vector_t* sprites)
+static void _machine_get_active_sprites_impl(struct machine_s* this, vector_t* sprites)
 {
     assert(this);
     size_t i;

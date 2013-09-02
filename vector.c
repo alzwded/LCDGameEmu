@@ -8,7 +8,7 @@ struct _vector_data {
     size_t capacity, size;
 };
 
-size_t _vector_size_impl(struct vector_s* this)
+static size_t _vector_size_impl(struct vector_s* this)
 {
     assert(this);
     struct _vector_data* obj = (struct _vector_data*)this->_data;
@@ -16,7 +16,7 @@ size_t _vector_size_impl(struct vector_s* this)
     return obj->size;
 }
 
-void _vector_resize_impl(struct vector_s* obj, size_t const new_size)
+static void _vector_resize_impl(struct vector_s* obj, size_t const new_size)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
@@ -31,7 +31,7 @@ void _vector_resize_impl(struct vector_s* obj, size_t const new_size)
     this->size = new_size;
 }
 
-void _vector_append_impl(struct vector_s* obj, void const* a)
+static void _vector_append_impl(struct vector_s* obj, void const* a)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
@@ -43,7 +43,7 @@ void _vector_append_impl(struct vector_s* obj, void const* a)
     this->data[this->size++] = (void*)a;
 }
 
-void _vector_set_impl(struct vector_s* obj, size_t const idx, void const* a)
+static void _vector_set_impl(struct vector_s* obj, size_t const idx, void const* a)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
@@ -66,7 +66,7 @@ void _vector_set_impl(struct vector_s* obj, size_t const idx, void const* a)
     this->data[idx] = (void*)a;
 }
 
-void* _vector_get_impl(struct vector_s* obj, size_t const idx)
+static void* _vector_get_impl(struct vector_s* obj, size_t const idx)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
@@ -75,7 +75,7 @@ void* _vector_get_impl(struct vector_s* obj, size_t const idx)
     return this->data[idx];
 }
 
-void** _vector_array_impl(struct vector_s* obj)
+static void** _vector_array_impl(struct vector_s* obj)
 {
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
@@ -92,6 +92,7 @@ vector_t* new_vector()
     d->data = (void**)malloc(sizeof(void*) * 2);
     ret->_data = d;
 
+    ret->size = _vector_size_impl;
     ret->resize = _vector_resize_impl;
     ret->append = _vector_append_impl;
     ret->set = _vector_set_impl;
@@ -110,6 +111,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     d->data = (void**)malloc(sizeof(void*) * initialCapacity);
     memset(d->data, 0, initialCapacity);
 
+    ret->size = _vector_size_impl;
     ret->resize = _vector_resize_impl;
     ret->append = _vector_append_impl;
     ret->set = _vector_set_impl;

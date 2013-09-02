@@ -9,7 +9,6 @@
 game_t* THEGAME;
 static machine_t* g_machine;
 
-
 void cleanup()
 {
     delete_machine(&g_machine);

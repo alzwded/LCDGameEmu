@@ -17,7 +17,7 @@ void parser_set_stream(FILE* f)
 
 // comparator used to sort states, sprites and macros
 // relies on the fact that all of these have an int id as the first member
-int _pint_comparator(void const* a, void const* b)
+static int _pint_comparator(void const* a, void const* b)
 {
     unsigned* left = (unsigned*)a;
     unsigned* right = (unsigned*)b;
@@ -28,7 +28,7 @@ int _pint_comparator(void const* a, void const* b)
 }
 
 #define DECL_GAME_ADD_STUFF_METHOD(TYPE) \
-void _game_add_##TYPE(struct game_s* this, TYPE##_t * s) \
+static void _game_add_##TYPE(struct game_s* this, TYPE##_t * s) \
 { \
     if(this->n##TYPE##s >= this->c##TYPE##s) { \
         this->TYPE##s = (TYPE##_t**)realloc(this->TYPE##s, sizeof(TYPE##_t*) * (this->c##TYPE##s << 1)); \

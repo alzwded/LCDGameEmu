@@ -26,6 +26,7 @@ static void _machine_onclock_impl(struct machine_s* this)
     assert(this);
     code_t* code = _get_code_of(this, this->current_state);
     interpreter_eval(this, code);
+    assert(this->stack->empty(this->stack));
 }
 
 static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)

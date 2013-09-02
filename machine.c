@@ -17,8 +17,8 @@ static int _state_comp(void const* a, void const* b)
 
 static code_t* _get_code_of(machine_t* this, unsigned stateId)
 {
-    code_t* ret = (code_t*)bsearch(&stateId, this->game->states, this->game->nstates, sizeof(state_t), _state_comp);
-    return ret;
+    code_t** ret = (code_t**)bsearch(&stateId, this->game->states, this->game->nstates, sizeof(state_t), _state_comp);
+    return *ret;
 }
 
 static void _machine_onclock_impl(struct machine_s* this)

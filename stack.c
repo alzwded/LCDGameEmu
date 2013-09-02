@@ -6,6 +6,17 @@ struct _stack_data {
     void const* data;
 };
 
+static void _stack_clear_impl(struct stack_s* this)
+{
+    assert(this);
+    struct _stack_data* d = (struct _stack_data*)this->_data;
+    while(d) {
+        struct _stack_data* prev = d->prev;
+        free(d);
+        d = prev;
+    }
+}
+
 static void _stack_push_impl(struct stack_s* this, void const* a)
 {
     assert(this);
@@ -66,6 +77,7 @@ stack_t* new_stack()
     ret->pop = &_stack_pop_impl;
     ret->size = &_stack_size_impl;
     ret->empty = &_stack_empty_impl;
+    ret->clear = &_stack_clear_impl;
 
     return ret;
 }
@@ -73,12 +85,7 @@ stack_t* new_stack()
 void delete_stack(stack_t** this)
 {
     if(!*this) return;
-    struct _stack_data* d = (struct _stack_data*)(*this)->_data;
-    while(d) {
-        struct _stack_data* prev = d->prev;
-        free(d);
-        d = prev;
-    }
+    _stack_clear_impl(*this);
     free(*this);
     *this = NULL;
 }

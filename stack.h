@@ -8,6 +8,7 @@ typedef struct stack_s {
     void (*push)(struct stack_s*, void const*);
     void* (*pop)(struct stack_s*);
     size_t (*size)(struct stack_s*);
+    int (*empty)(struct stack_s*);
 } stack_t;
 
 stack_t* new_stack();

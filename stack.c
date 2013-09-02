@@ -8,8 +8,8 @@ struct _stack_data {
 
 static void _stack_push_impl(struct stack_s* this, void const* a)
 {
-    struct _stack_data* d = (struct _stack_data*)malloc(sizeof(struct _stack_data));
     assert(this);
+    struct _stack_data* d = (struct _stack_data*)malloc(sizeof(struct _stack_data));
 
     if(this->_data) {
         struct _stack_data* prev = (struct _stack_data*)this->_data;
@@ -37,10 +37,10 @@ static void* _stack_pop_impl(struct stack_s* this)
 
 static size_t _stack_size_impl(struct stack_s* this)
 {
+    assert(this);
+
     struct _stack_data* d = (struct _stack_data*)this->_data;
     size_t size = 0;
-
-    assert(this);
 
     while(d) {
         size++;
@@ -48,6 +48,13 @@ static size_t _stack_size_impl(struct stack_s* this)
     }
 
     return size;
+}
+
+static int _stack_empty_impl(struct stack_s* this)
+{
+    assert(this);
+    struct _stack_data* d = (struct _stack_data*)this->_data;
+    return d == NULL;
 }
 
 stack_t* new_stack()
@@ -58,6 +65,7 @@ stack_t* new_stack()
     ret->push = &_stack_push_impl;
     ret->pop = &_stack_pop_impl;
     ret->size = &_stack_size_impl;
+    ret->empty = &_stack_empty_impl;
 
     return ret;
 }

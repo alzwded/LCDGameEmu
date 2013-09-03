@@ -47,9 +47,11 @@ void init()
 void start()
 {
     // TODO launch timer which calls g_machine->onclock(g_machine)
-    int i;
-    for(i = 0; i < g_test; ++i)
-        g_machine->onclock(g_machine);
+    if(g_test) {
+        int i;
+        for(i = 0; i < g_test; ++i)
+            g_machine->onclock(g_machine);
+    }
 }
 
 void test()

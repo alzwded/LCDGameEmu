@@ -11,6 +11,7 @@ typedef struct {
 typedef enum {
     ctNOP = 0,
     ctREGISTER,
+    ctIDENT,
     ctRESETALL,
     ctSETVAR,
     ctSETSPRITE,
@@ -86,7 +87,7 @@ void delete_macro(macro_t**);
 // code_t factories
 code_t* new_nop();
 code_t* new_reg(unsigned);
-code_t* new_ident(char*);
+code_t* new_ident(char const*);
 code_t* new_set_sprite(unsigned, sprite_state_t);
 code_t* new_set_var(code_t* var, code_t* value);
 code_t* new_reset_all();
@@ -103,6 +104,6 @@ void normalize_code(code_t**);
 
 // set the stream the lexer uses
 void parser_set_stream(FILE* f);
-FILE* const parser_get_stream();
+FILE* parser_get_stream();
 
 #endif

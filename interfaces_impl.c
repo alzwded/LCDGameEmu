@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "interfaces.h"
 #include "log.h"
+#include "inputbit.h"
 
 static FILE* g_parser_stream;
 
-FILE* const parser_get_stream()
+FILE* parser_get_stream()
 {
     return g_parser_stream;
 }
@@ -109,6 +111,7 @@ char const* strct(code_type_t type)
     switch(type) {
     TYPE_TO_STRING(ctNOP);
     TYPE_TO_STRING(ctREGISTER);
+    TYPE_TO_STRING(ctIDENT);
     TYPE_TO_STRING(ctRESETALL);
     TYPE_TO_STRING(ctSETVAR);
     TYPE_TO_STRING(ctSETSPRITE);
@@ -225,11 +228,40 @@ code_t* new_reg(unsigned r)
     return ret;
 }
 
-code_t* new_ident(char* s)
+struct _ident_mapping_s {
+    char const* s;
+    unsigned i;
+};
+static struct _ident_mapping_s _idents[] = {
+    { "left", LEFT },
+    { "right", RIGHT },
+    { "up", UP },
+    { "down", DOWN },
+    { "fire", FIRE },
+    { "alt", ALT },
+    { "start", START },
+    { "toggle", TOGGLE },
+    { "upleft", UPLEFT },
+    { "upright", UPRIGHT },
+    { "downleft", DOWNLEFT },
+    { "downright", DOWNRIGHT },
+    { NULL, 0 }
+};
+
+code_t* new_ident(char const* s)
 {
     code_t* ret = new_nop();
-    ret->type = ctREGISTER;
-    ret->left.num = -0xFF; // TODO switch(s) => int
+    struct _ident_mapping_s* p = _idents;
+    for(; p->i != 0; ++p) {
+        if(strcmp(p->s, s) == 0) {
+            ret->left.num = p->i;
+            break;
+        }
+    }
+    ret->type = ctIDENT;
+    if(p->i == 0) {
+        delete_code(&ret);
+    }
     return ret;
 }
 

@@ -25,8 +25,11 @@ static void _machine_onclock_impl(struct machine_s* this)
 {
     assert(this);
     code_t* code = _get_code_of(this, this->current_state);
+    this->stack->clear(this->stack);
+    this->running = 1;
     interpreter_eval(this, code);
-    assert(this->stack->empty(this->stack));
+    this->running = 0;
+    //assert(this->stack->empty(this->stack));
 }
 
 static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
@@ -69,6 +72,7 @@ machine_t* new_machine(game_t const* game)
     memset(&ret->registers, 0, 100);
     ret->stack = new_stack();
     ret->sprite_state = new_vector_of(game->nsprites); // sets everything to 0
+    ret->running = 0;
 
     ret->onclock = &_machine_onclock_impl;
     ret->set_input = &_machine_set_input_impl;

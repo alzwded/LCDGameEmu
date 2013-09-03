@@ -114,7 +114,7 @@ nop : ".nop" { $$ = new_nop(); } ;
 
 /* VAR : '$' INT | '$' IDENT ; actually processed in lexer */
 VAR : REG { $$ = new_reg($1); }
-    | IDENT { $$ = new_ident(strdup($1)); }
+    | IDENT { $$ = new_ident($1); }
     ;
 set_statement : ".set" INT { $$ = new_set_sprite($2, ssON); }
               | ".reset" INT { $$ = new_set_sprite($2, ssOFF); }

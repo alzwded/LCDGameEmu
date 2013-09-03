@@ -8,6 +8,7 @@
 
 game_t* THEGAME;
 static machine_t* g_machine;
+int g_test = 0;
 
 void cleanup()
 {
@@ -46,7 +47,9 @@ void init()
 void start()
 {
     // TODO launch timer which calls g_machine->onclock(g_machine)
-    g_machine->onclock(g_machine);
+    int i;
+    for(i = 0; i < g_test; ++i)
+        g_machine->onclock(g_machine);
 }
 
 void test()
@@ -55,6 +58,12 @@ void test()
     init();
     start();
     cleanup();
+}
+
+void args_test(char const* times)
+{
+    if(times) g_test = atoi(times);
+    else g_test = 1;
 }
 
 void args_set_debug_level(char const* s)
@@ -73,7 +82,8 @@ int main(int argc, char* argv[])
 
     HandleParameters(argc, argv);
 
-    test();
+    if(g_test) test();
+    else test();
 
     return 0;
 }

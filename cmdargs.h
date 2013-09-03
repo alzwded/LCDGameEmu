@@ -7,5 +7,6 @@ void HandleParameters(int argc, char* argv[]);
 
 void args_set_debug_level(char const*);
 void args_load(char const*);
+void args_test(char const*);
 
 #endif

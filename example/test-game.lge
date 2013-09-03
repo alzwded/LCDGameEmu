@@ -69,10 +69,11 @@
 0
 .set 1
 .if .set 117 & = $0 0 ; .set $0 1 .fi
-.if .set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 .fi
-.if .set 227 & = $1 0 ; .set $1 1 .fi
-.if .set 227 & = $1 1 ; .reset 227 & .set 226 & .set $1 0 .fi 
+#.if .set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 .fi
+#.if .set 227 & = $1 0 ; .set $1 1 .fi
+#.if .set 227 & = $1 1 ; .reset 227 & .set 226 & .set $1 0 .fi 
 .if %.4 ; .set 117 .fi       # if 40% chance
+.if = 1 1 & .reset 117 ; .set 117 .fi
 .if %.4 ; .set 227 .fi
 .if .set $right ; .transition 1 .fi
 .if = $11 3 ; .reset 13 & .set $11 0 .fi

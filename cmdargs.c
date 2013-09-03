@@ -23,6 +23,7 @@ static const Option Options[] = {
     { "help", 'h', NO, "print this message", &PrintHelp },
     { "usage", '\0', NO, "print this message", &PrintHelp },
     { "version", 'V', NO, "print the current version", &PrintVersion },
+    { "test", 't', FILE_NOT_FOUND, "run debug test [opt N times]", &args_test },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
 };
 

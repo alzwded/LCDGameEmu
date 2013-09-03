@@ -6,12 +6,12 @@ EXE = lcdgameemu
 OBJS = parser.o interfaces_impl.o log.o cmdargs.o machine.o vector.o \
 	stack.o interpreter.o
 CC = gcc
-COPTS = -g -c -I. -Wall -DLGEVERSION=$(LGEVERSION)
+COPTS = -g -c -I. -Wall -DLGEVERSION=$(LGEVERSION) `pkg-config --libs --cflags sdl`
 LD = gcc
-LDOPTS = 
+LDOPTS = `pkg-config --libs --cflags sdl`
 
 $(EXE): $(MAINOBJ) $(OBJS)
-	$(LD) $(LDOPTS) -o $(EXE) $(MAINOBJ) $(OBJS)
+	$(LD) -o $(EXE) $(MAINOBJ) $(OBJS) $(LDOPTS)
 
 %.o: %.c
 	$(CC) $(COPTS) -o $@ $<

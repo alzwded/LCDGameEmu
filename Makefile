@@ -3,7 +3,7 @@ YACC = bison
 YACCOPTS = --graph -k -v
 MAINOBJ = main.o
 EXE = lcdgameemu
-OBJS = parser.o interfaces_impl.o log.o cmdargs.o machine.o vector.o \
+OBJS = parser.o code.o log.o cmdargs.o machine.o vector.o \
 	stack.o interpreter.o
 CC = gcc
 COPTS = -g -c -I. -Wall -DLGEVERSION=$(LGEVERSION) `pkg-config --libs --cflags sdl`

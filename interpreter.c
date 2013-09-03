@@ -1,5 +1,5 @@
 #include "interpreter.h"
-#include "interfaces.h"
+#include "code.h"
 #include "log.h"
 #include <assert.h>
 #include <memory.h>

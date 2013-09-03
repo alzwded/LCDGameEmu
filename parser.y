@@ -7,7 +7,7 @@ Grammar for LGEScript .lge files
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
-#include "interfaces.h"
+#include "code.h"
 #include "log.h"
 
 int yyerror(char const*);

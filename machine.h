@@ -2,7 +2,7 @@
 #define MACHINE_H
 
 #include <stdlib.h>
-#include "interfaces.h"
+#include "code.h"
 #include "stack.h"
 #include "vector.h"
 #include "inputbit.h"

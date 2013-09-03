@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "interfaces.h"
+#include "code.h"
 #include "log.h"
 #include "cmdargs.h"
 #include "machine.h"

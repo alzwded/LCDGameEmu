@@ -15,7 +15,6 @@ static viewer_t* console_viewer;
 void cleanup()
 {
     if(g_machine && console_viewer) g_machine->remove_viewer(g_machine, console_viewer);
-    delete_console_viewer(&console_viewer);
     delete_machine(&g_machine);
     delete_game(&THEGAME);
 }
@@ -45,8 +44,7 @@ static char const* fileName = "example/test-game.lge";
 void init()
 {
     g_machine = new_machine(THEGAME);
-    console_viewer = new_console_viewer();
-    g_machine->add_viewer(g_machine, console_viewer);
+    if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
     // TODO init gui
 }
 
@@ -66,6 +64,11 @@ void test()
     init();
     start();
     cleanup();
+}
+
+void args_console_viewer_enable(char const* _)
+{
+    console_viewer = new_console_viewer();
 }
 
 void args_test(char const* times)
@@ -92,6 +95,8 @@ int main(int argc, char* argv[])
 
     if(g_test) test();
     else test();
+
+    delete_console_viewer(&console_viewer);
 
     return 0;
 }

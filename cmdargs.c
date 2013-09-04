@@ -24,6 +24,7 @@ static const Option Options[] = {
     { "usage", '\0', NO, "print this message", &PrintHelp },
     { "version", 'V', NO, "print the current version", &PrintVersion },
     { "test", 't', FILE_NOT_FOUND, "run debug test [opt N times]", &args_test },
+    { "console-viewer", 'C', NO, "enable console viewer", &args_console_viewer_enable },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
 };
 

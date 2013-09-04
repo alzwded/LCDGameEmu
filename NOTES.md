@@ -180,3 +180,16 @@ The entity GUI will contain:
 * sound engine (not implemented, TODO v2)
 * an init procedure: init_gui(game_t* THEGAME)
 * a 100ms clock that triggers the BackEnd's interpreter
+
+TODO
+====
+
+
+Input simulator
+---------------
+
+Implement debug input simulator;
+
+I imagine something like: ```
+lcdgameemu --console-viewer --test=20 --input=1:start,5:left,6:fire,10:right,11:fire,20:right
+```

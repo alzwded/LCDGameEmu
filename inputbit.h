@@ -23,4 +23,11 @@ typedef enum {
     HI = 1
 } input_bit_state_t;
 
+struct _ident_mapping_s {
+    char const* s;
+    unsigned i;
+};
+
+input_bit_t str2inputbit(char const*);
+
 #endif

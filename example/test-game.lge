@@ -67,7 +67,8 @@
 
 .state 0
 .set $0 10
-.transition 31
+.if .reset $left ; .transition 31 .fi
+.transition 0
 .set $0 255
 .end
 

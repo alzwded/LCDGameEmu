@@ -229,39 +229,13 @@ code_t* new_reg(unsigned r)
     return ret;
 }
 
-struct _ident_mapping_s {
-    char const* s;
-    unsigned i;
-};
-static struct _ident_mapping_s _idents[] = {
-    { "left", LEFT },
-    { "right", RIGHT },
-    { "up", UP },
-    { "down", DOWN },
-    { "fire", FIRE },
-    { "alt", ALT },
-    { "start", START },
-    { "toggle", TOGGLE },
-    { "upleft", UPLEFT },
-    { "upright", UPRIGHT },
-    { "downleft", DOWNLEFT },
-    { "downright", DOWNRIGHT },
-    { NULL, 0 }
-};
-
 code_t* new_ident(char const* s)
 {
     code_t* ret = new_nop();
-    struct _ident_mapping_s* p = _idents;
-    for(; p->i != 0; ++p) {
-        if(strcmp(p->s, s) == 0) {
-            ret->left.num = p->i;
-            break;
-        }
-    }
+    ret->left.num = str2inputbit(s);
     ret->type = ctIDENT;
-    assert(p->i);
-    if(p->i == 0) {
+    assert(ret->left.num);
+    if(ret->left.num == 0) {
         delete_code(&ret);
     }
     return ret;

@@ -4,7 +4,7 @@ YACCOPTS = --graph -k -v
 MAINOBJ = main.o
 EXE = lcdgameemu
 OBJS = parser.o code.o log.o cmdargs.o machine.o vector.o \
-	stack.o interpreter.o window.o console_viewer.o
+	stack.o interpreter.o window.o console_viewer.o inputbit_impl.o
 CC = gcc
 COPTS = -g -c -I. -Wall -DLGEVERSION=$(LGEVERSION) `pkg-config --libs --cflags sdl`
 LD = gcc

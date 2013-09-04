@@ -118,7 +118,7 @@ VAR : REG { $$ = new_reg($1); }
     ;
 set_statement : ".set" INT { $$ = new_set_sprite($2, ssON); }
               | ".reset" INT { $$ = new_set_sprite($2, ssOFF); }
-              | ".set" VAR arithmetic_expression { $$ = new_set_var($2, $3); }
+              | ".set" REG arithmetic_expression { $$ = new_set_var(new_const($2), $3); }
               | ".reset" ".all" { $$ = new_reset_all(); }
               ;
 transition_statement : ".transition" INT { $$ = new_transition($2); }

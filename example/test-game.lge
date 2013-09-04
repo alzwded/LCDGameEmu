@@ -65,8 +65,25 @@
 .if ~ $left & ~ ~ $right ; .transition 0 .fi
 .end
 
+.state 0
+.set $0 10
+.transition 31
+.set $0 255
+.end
+
+.state 31
+.set $0 + $0 1
+.if = 0 .mod $0 2 ;
+    .set 117
+.fi
+.if = 1 .mod $0 2 ;
+    .reset 117
+.fi
+.if > $0 13 ; .transition 0 .fi
+.end
+
 .state
-0
+3
 .set 1
 .if .set 117 & = $0 0 ; .set $0 1 .fi
 #.if .set 117 & = $0 1 ; .reset 117 & .set 116 & .set $0 0 .fi

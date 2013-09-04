@@ -67,9 +67,12 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             return;
         case ctNOP:
             break;
-        case ctREGISTER:
-            this->stack->push(this->stack, (void const*)ip->left.num);
-            break;
+        case ctREGISTER: {
+            unsigned reg = ip->left.num;
+            assert(reg < 100);
+            unsigned val = this->registers[reg];
+            this->stack->push(this->stack, (void const*)(val));
+            break; }
         case ctIDENT:
             this->stack->push(this->stack, (void const*)ip->left.num);
             break;

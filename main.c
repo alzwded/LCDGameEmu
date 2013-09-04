@@ -5,13 +5,17 @@
 #include "log.h"
 #include "cmdargs.h"
 #include "machine.h"
+#include "console_viewer.h"
 
 game_t* THEGAME;
 static machine_t* g_machine;
 int g_test = 0;
+static viewer_t* console_viewer;
 
 void cleanup()
 {
+    if(g_machine && console_viewer) g_machine->remove_viewer(g_machine, console_viewer);
+    delete_console_viewer(&console_viewer);
     delete_machine(&g_machine);
     delete_game(&THEGAME);
 }
@@ -41,6 +45,8 @@ static char const* fileName = "example/test-game.lge";
 void init()
 {
     g_machine = new_machine(THEGAME);
+    console_viewer = new_console_viewer();
+    g_machine->add_viewer(g_machine, console_viewer);
     // TODO init gui
 }
 

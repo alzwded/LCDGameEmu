@@ -36,6 +36,7 @@ void HandleParameters(int argc, char* argv[])
         char* param;
         size_t len = strlen(s);
         const Option* p = &Options[0];
+        // FIXME this is stupid and broken.
         for(;
             p->LongName != NULL || p->ShortName != '\0';
             ++p)

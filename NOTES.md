@@ -181,9 +181,21 @@ The entity GUI will contain:
 * an init procedure: init_gui(game_t* THEGAME)
 * a 100ms clock that triggers the BackEnd's interpreter
 
+Roadmap
+=======
+
+| version    | what                                                  |
+|------------|-------------------------------------------------------|
+| 0.3-pre    | input simulator and parser/interpreter validation     |
+| 0.4-pre    | initial GUI in view mode                              |
+| 0.5        | GUI with input                                        |
+| 0.6        | joystick support, remappable input                    |
+| 0.7        | example game that demoes what this turkey can do      |
+| 0.9        | sound? TBD                                            |
+| 1.0        | gold. Playable pre-bundled game (think DK)            |
+
 TODO
 ====
-
 
 Input simulator
 ---------------

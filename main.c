@@ -24,6 +24,7 @@ extern int yydebug;
 int load(char const* fileName)
 {
     assert(fileName);
+    unsigned ret = 1;
     FILE* f = fopen(fileName, "r");
     if(!f) {
         fprintf(stderr, "cannot open %s\n", fileName);
@@ -36,7 +37,11 @@ int load(char const* fileName)
     parser_set_stream(f);
 
     // launch parser
-    return yyparse();
+    ret = yyparse() != 0;
+
+    fclose(f);
+
+    return ret;
 }
 
 static char const* fileName = "example/test-game.lge";

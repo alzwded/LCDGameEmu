@@ -29,7 +29,10 @@ static void _machine_onclock_impl(struct machine_s* this)
     this->running = 1;
     interpreter_eval(this, code);
     this->running = 0;
-    //assert(this->stack->empty(this->stack));
+    {int i; for(i = 0; i < this->viewers->size(this->viewers); ++i) {
+        viewer_t* viewer = (viewer_t*)this->viewers->get(this->viewers, i);
+        if(viewer) viewer->nudge(viewer, this);
+    }}
 }
 
 static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
@@ -62,6 +65,29 @@ static void _machine_get_active_sprites_impl(struct machine_s* this, vector_t* s
     }
 }
 
+static void _machine_add_viewer(struct machine_s* this, viewer_t* viewer)
+{
+    size_t i;
+    for(i = 0; i < this->viewers->size(this->viewers); ++i) {
+        if(this->viewers->get(this->viewers, i) == NULL) {
+            this->viewers->set(this->viewers, i, (void const*)viewer);
+            return;
+        }
+    }
+    this->viewers->append(this->viewers, (void const*)viewer);
+}
+
+static void _machine_remove_viewer(struct machine_s* this, viewer_t* viewer)
+{
+    size_t i;
+    for(i = 0; i < this->viewers->size(this->viewers); ++i) {
+        if(this->viewers->get(this->viewers, i) == viewer) {
+            this->viewers->set(this->viewers, i, NULL);
+            return;
+        }
+    }
+}
+
 machine_t* new_machine(game_t const* game)
 {
     machine_t* ret = (machine_t*)malloc(sizeof(machine_t));
@@ -73,11 +99,14 @@ machine_t* new_machine(game_t const* game)
     ret->stack = new_stack();
     ret->sprite_state = new_vector_of(game->nsprites); // sets everything to 0
     ret->running = 0;
+    ret->viewers = new_vector();
 
     ret->onclock = &_machine_onclock_impl;
     ret->set_input = &_machine_set_input_impl;
     ret->set_input_mask = &_machine_set_input_mask_impl;
     ret->get_active_sprites = &_machine_get_active_sprites_impl;
+    ret->add_viewer = &_machine_add_viewer;
+    ret->remove_viewer = &_machine_remove_viewer;
 
     return ret;
 }
@@ -88,6 +117,7 @@ void delete_machine(machine_t** this)
 
     if((*this)->stack) delete_stack(&(*this)->stack);
     if((*this)->sprite_state) delete_vector(&(*this)->sprite_state);
+    if((*this)->viewers) delete_vector(&(*this)->viewers);
 
     free(*this);
     *this = NULL;

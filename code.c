@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "code.h"
 #include "log.h"
 #include "inputbit.h"
@@ -259,6 +260,7 @@ code_t* new_ident(char const* s)
         }
     }
     ret->type = ctIDENT;
+    assert(p->i);
     if(p->i == 0) {
         delete_code(&ret);
     }

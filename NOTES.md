@@ -197,8 +197,8 @@ Roadmap
 TODO
 ====
 
-Input simulator
----------------
+~~Input simulator~~
+-------------------
 
 Implement debug input simulator;
 
@@ -206,3 +206,9 @@ I imagine something like:
 ```
 lcdgameemu --console-viewer --test=20 --input=1:start,5:left,6:fire,10:right,11:fire,20:right
 ```
+
+In more detail:
+* input simulator is enabled together with the console viewer (which becomes a console viewer/constroller)
+* the console viewer prints the status of the machine at frame #N, the input that was active during that frame and the sprites active after that frame, as well as the state of the registers after the frame
+* If you want to push multiple buttons, just add two separate entries for the same frame, e.g.: `...,42:left,42:fire,43:up,...`
+* you can imagine that using this input simulator and a real thing might prove problematic, so I guess I should add a flag to disable all other possible viewers or something weird like that :-/

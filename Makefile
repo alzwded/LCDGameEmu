@@ -1,4 +1,4 @@
-LGEVERSION = '"0.2-pre"'
+LGEVERSION = '"0.3-pre"'
 YACC = bison
 YACCOPTS = --graph -k -v
 MAINOBJ = main.o

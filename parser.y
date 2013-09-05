@@ -73,7 +73,7 @@ state : ".state" INT code { $$ = new_state($2, $3); } ;
 
 code : codes ".end" {
         assert($1);
-        $$ = ($1->first) ? $1->first : $1 ;
+        $$ = $1->first;
         }
      | ".end" { $$ = new_nop(); } /* no code in current section
                                      this is equivalent to a HALT loop
@@ -83,20 +83,22 @@ code : codes ".end" {
 codes : codes block {
         assert($1);
         assert($2);
-        if($1->first) $2->first = $1->first;
-        else $2->first = $1;
-        $1 = $1->next = $2;
-        $$ = $1;
+        code_t* ret = $2;
+        code_t* p = $2->first;
+        $1->next = $2->first;
+        for(; p; p = p->next) {
+            p->first = $1->first;
+        }
+        $$ = ret;
     }
       | block { $$ = $1; }
       ;
 block : block '&' statement {
         assert($1);
         assert($3);
-        if($1->first) $3->first = $1->first;
-        else $3->first = $1;
-        $1 = $1->next = $3;
-        $$ = $1;
+        $3->first = $1->first;
+        $1->next = $3;
+        $$ = $3;
     }
       | statement { $$ = $1; }
   ;
@@ -389,5 +391,6 @@ int yylex()
 int yyerror(char const* s)
 {
     fprintf(stderr, "%s\n", s);
+    exit(0);
     return 0;
 }

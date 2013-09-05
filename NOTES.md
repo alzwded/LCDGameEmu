@@ -60,7 +60,7 @@ Transitions between states are handled by .transition statements in the code sec
 
 There are a total of 100 internal registers you can use to store temporary data. They are BYTE-sized. The are accessed using the $N syntax. The number 100 is completely arbitrary and in the future it may be configurable.
 
-There are also a number of predefined read-only registers, namely $left, $right, $up, $down, $fire, $alt, $start, $toggle, $upleft, $upright, $downleft, $downright . Virtually, these represent keys that may or may not be available to the user. By default they are mapped to <left>, <right>, <up>, <down> 1, 2, 0, 9, Q, P, A, L by default. In the future, they may also be mapped to a joystick or user configurable.
+There are also a number of predefined read-only registers, namely $left, $right, $up, $down, $fire, $alt, $start, $toggle, $upleft, $upright, $downleft, $downright . Virtually, these represent keys that may or may not be available to the user. By default they are mapped to `left`, `right`, `up`, `down` `1`, `2`, `0`, `9`, `Q`, `P`, `A`, `L` by default. In the future, they may also be mapped to a joystick or user configurable.
 
 Register data is written using the .set instruction. For example, .set $1 0 assigns the int value 0 to register 1. The lvalue needs to be writable. The left value can be a literal constant, another register, the state of a sprite, or an expression.
 

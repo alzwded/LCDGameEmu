@@ -202,6 +202,7 @@ Input simulator
 
 Implement debug input simulator;
 
-I imagine something like: ```
+I imagine something like:
+```
 lcdgameemu --console-viewer --test=20 --input=1:start,5:left,6:fire,10:right,11:fire,20:right
 ```

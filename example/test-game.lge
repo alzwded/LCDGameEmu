@@ -123,7 +123,10 @@
 .if = 1 1 & .reset 117 ; .set 117 .fi
 .if %.4 ; .set 227 .fi
 .if .set $right ; .transition 1 .fi
-.if = $11 3 ; .reset 13 & .set $11 0 .fi
+.if = $11 3 ;
+    .reset 13 
+    .set $11 0
+.fi
 .if = $11 2 ; .reset 12 & .set 13 & .set $11 3 .fi
 .if = $11 1 ; .reset 11 & .set 12 & .set $11 2 .fi
 .if = $11 0 & .set $fire ; .set 11 & .set $11 1 .fi

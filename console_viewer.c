@@ -19,7 +19,7 @@ static void _console_viewer_nudge(struct viewer_s* this, void* source)
     _console_viewer_data_t* data = (_console_viewer_data_t*)this->_data;
     strftime(buf, sizeof(buf), "%H:%M:%S", lnow);
     printf("%s: Console Viewer Entry #%u\n", buf, data->current_frame);
-    printf("In state %u\n", machine->current_state);
+    printf("Next state %u\n", machine->current_state);
     printf("Active sprites: ");
     machine->get_active_sprites(machine, sprites);
     for(i = 0; i < sprites->size(sprites); ++i) {

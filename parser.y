@@ -174,7 +174,7 @@ condition : condition '&' atomic_condition {
           | atomic_condition { $$ = $1; }
           ;
 
-conditional_statement : ".if" condition ';' block ".fi" { $$ = new_if($2, $4); } ;
+conditional_statement : ".if" condition ';' codes ".fi" { $$ = new_if($2, $4); } ;
 
 
 %%

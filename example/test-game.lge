@@ -66,13 +66,22 @@
 .end
 
 .state 0
+.set $0 10 & .transition 35
 .set $0 10
 .if .reset $left ; .transition 31 .fi
+.set $2 255
 .transition 0
 .set $0 255
 .end
 
+.state 35
+.if > $0 7 & .set $left ; .set $0 - $0 1 .fi
+.if < $0 13 & .set $right ; .set $0 + $0 1 .fi
+.if .set $fire ; .transition 0 .fi
+.end
+
 .state 31
+.if .set $left ; .set $10 255 .fi
 .set $0 + $0 1
 .if = 0 .mod $0 2 ;
     .set 117

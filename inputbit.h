@@ -14,8 +14,9 @@ typedef enum {
     UPRIGHT = 0x200,
     DOWNLEFT = 0x400,
     DOWNRIGHT = 0x800,
-    LAST_BIT = 0x1000,
+    ALL_INPUT_BITS = 0xFFF,
 } input_bit_t;
+
 
 typedef unsigned input_bit_field_t;
 typedef enum {

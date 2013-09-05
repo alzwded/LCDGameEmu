@@ -25,6 +25,7 @@ static const Option Options[] = {
     { "version", 'V', NO, "print the current version", &PrintVersion },
     { "test", 't', FILE_NOT_FOUND, "run debug test [opt N times]", &args_test },
     { "console-viewer", 'C', NO, "enable console viewer", &args_console_viewer_enable },
+    { "input", 'i', YES, "input the console viewer will send; format is <frame>:<button>[,<frame>:<button>]*", &args_input },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
 };
 

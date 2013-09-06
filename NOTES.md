@@ -92,7 +92,7 @@ If you use the same chunk of code multiple times, you can store it in something 
 
 There is no notion of local/global/thread_local variables here. All you have to work with are the 100 r/w registers and the states of sprites you'd defined. So macros do not take parameters nor do the return values (not explicity, at least).
 
-Comments are delimited by # and EOL. # this is a comment
+Comments are delimited by # and EOL. # this is a comment  
 This is not.
 
 The would have been no point to introduce the notion of "variables" or "stacks" since in that case, someone would've been able to actually implement decent quicky-games on this thing. That is not the point. The point is to force people to create emulations of bad chineso-british LCD games (like Nintendo's Game&Watch games, only bad and done in a hurry with 0 funding or research).

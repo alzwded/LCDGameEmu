@@ -23,3 +23,12 @@ TODO
 * ~~loader~~ done
 * controls (scripted input done, ongoing)
 * cmd line switch to set the clock cycle time
+
+Testing
+=======
+
+Since it doesn't really do anything right now because the input is not implemented, you can test it with
+```
+lcdgameemu -C --input=6:right,10:left,12:right
+```
+to actually see it do something :-D

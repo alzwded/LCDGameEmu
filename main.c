@@ -148,13 +148,14 @@ void ProcessWhatJustHasHappened()
 
 int main(int argc, char* argv[])
 {
-    jaklog_set_level(TRACE);
+    jaklog_set_level(DEBUG);
 
     HandleParameters(argc, argv);
     ProcessWhatJustHasHappened();
 
-    if(g_MAIN_ARGS_INST.g_test) test();
-    else test(); // TODO :-P
+    //if(g_MAIN_ARGS_INST.g_test) test();
+    //else test(); // TODO :-P
+    test();
 
     delete_console_viewer(&console_viewer);
     delete_vector(&g_MAIN_ARGS_INST.input);

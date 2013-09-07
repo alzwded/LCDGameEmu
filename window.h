@@ -6,9 +6,10 @@
 typedef struct window_s {
     void* _data;
 
-    unsigned (*init)(struct window_s*);
+    unsigned (*init)(struct window_s*, char const*);
     void (*loop)(struct window_s*);
     void (*redraw)(struct window_s*);
+    viewer_t* (*get_viewer)(struct window_s*);
 } window_t;
 
 window_t* new_window(machine_t*);

@@ -10,7 +10,7 @@ typedef struct {
     // TODO other sdl stuff
 } window_data_t;
 
-void _window_viewer_impl_nudge(struct viewer_s* this, void* source)
+static void _window_viewer_impl_nudge(struct viewer_s* this, void* source)
 {
     window_t* window = (window_t*)this->_data;
     machine_t* machine = (machine_t*)source;
@@ -19,7 +19,7 @@ void _window_viewer_impl_nudge(struct viewer_s* this, void* source)
     window->redraw(window);
 }
 
-viewer_t* new_window_viewer_impl(window_t* parent)
+static viewer_t* new_window_viewer_impl(window_t* parent)
 {
     viewer_t* ret = (viewer_t*)malloc(sizeof(viewer_t));
     ret->_data = parent;
@@ -27,17 +27,29 @@ viewer_t* new_window_viewer_impl(window_t* parent)
     return ret;
 }
 
-unsigned _window_init(struct window_s* this)
+static unsigned _window_init(struct window_s* this, char const* path)
 {
+    // init SDL
+    // get game.assets path
+    // load bg.{bmp|png|jpg}
+    // load sprites
+    // open window
+    // set up input handling
     return 0;
 }
 
-void _window_loop(struct window_s* this)
+static void _window_loop(struct window_s* this)
 {
+    // set up a timer and start it
 }
 
-void _window_redraw(struct window_s* this)
+static void _window_redraw(struct window_s* this)
 {
+    // -- redraw logic
+    // clrscr()
+    // draw bg
+    // foreach active sprite
+    //    render it
 }
 
 window_t* new_window(machine_t* machine)

@@ -6,7 +6,8 @@
 typedef enum {
     WINDOW_ERR_SUCCESS = 0,
     WINDOW_ERR_SDL_INIT,
-    WINDOW_ERR_INVALID_PATH
+    WINDOW_ERR_INVALID_PATH,
+    WINDOW_ERR_NO_BG
 } window_init_err_code_t;
 
 typedef struct window_s {

@@ -8,6 +8,7 @@
 #include "machine.h"
 #include "console_viewer.h"
 #include "inputbit.h"
+#include "window.h"
 
 struct _MAIN_ARGS_s {
     int console_viewer:1;
@@ -24,12 +25,14 @@ struct _MAIN_ARGS_s g_MAIN_ARGS_INST = {
 game_t* THEGAME;
 static machine_t* g_machine;
 static viewer_t* console_viewer;
+static window_t* g_window;
 
 void cleanup()
 {
     if(g_machine && console_viewer) g_machine->remove_viewer(g_machine, console_viewer);
     delete_machine(&g_machine);
     delete_game(&THEGAME);
+    delete_window(&g_window);
 }
 
 extern int yydebug;
@@ -63,6 +66,9 @@ void init()
 {
     g_machine = new_machine(THEGAME);
     if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
+    g_window = new_window(g_machine);
+    g_window->init(g_window, fileName);
+    g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
     // TODO init gui
 }
 
@@ -73,6 +79,8 @@ void start()
         int i;
         for(i = 0; i < g_MAIN_ARGS_INST.g_test; ++i)
             g_machine->onclock(g_machine);
+    } else {
+        g_window->loop(g_window);
     }
 }
 

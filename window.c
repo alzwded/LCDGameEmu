@@ -186,7 +186,7 @@ static unsigned _window_init(struct window_s* this, char const* path, unsigned c
             strncpy(data->assets_path, path, p - path);
             strcpy(data->assets_path + (p - path), ".assets/");
             data->assets_path[l] = '\0';
-        } else if((p >= path && *p == '/') || p < path) {
+        } else if((p >= path && *p == '/' && (*p + 1) != '\0') || p < path) {
             size_t l = pathlen + 8;
             data->assets_path = (char*)malloc(sizeof(char) * l);
             strcpy(data->assets_path, path);

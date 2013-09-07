@@ -83,6 +83,26 @@ static void** _vector_array_impl(struct vector_s* obj)
     return this->data;
 }
 
+static void _vector_sort_impl(struct vector_s* this, comp_func_t func)
+{
+    assert(this);
+    struct _vector_data* data = (struct _vector_data*)this->_data;
+    assert(data);
+    assert(data->data);
+    qsort(data->data, data->size, sizeof(void*), func);
+}
+
+static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func_t func)
+{
+    assert(this);
+    struct _vector_data* data = (struct _vector_data*)this->_data;
+    assert(data);
+    assert(data->data);
+    void** found = bsearch(key, data->data, data->size, sizeof(void*), func);
+    if(!found) return NULL;
+    else return *found;
+}
+
 vector_t* new_vector()
 {
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
@@ -92,12 +112,14 @@ vector_t* new_vector()
     d->data = (void**)malloc(sizeof(void*) * 2);
     ret->_data = d;
 
-    ret->size = _vector_size_impl;
-    ret->resize = _vector_resize_impl;
-    ret->append = _vector_append_impl;
-    ret->set = _vector_set_impl;
-    ret->get = _vector_get_impl;
-    ret->array = _vector_array_impl;
+    ret->size = &_vector_size_impl;
+    ret->resize = &_vector_resize_impl;
+    ret->append = &_vector_append_impl;
+    ret->set = &_vector_set_impl;
+    ret->get = &_vector_get_impl;
+    ret->array = &_vector_array_impl;
+    ret->sort = &_vector_sort_impl;
+    ret->find = &_vector_find_impl;
 
     return ret;
 }

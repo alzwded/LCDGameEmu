@@ -3,11 +3,12 @@
 # If I ever finish this project, this game is not to be taken seriously
 # It is an example, duh
 
-.sprite 0 150 175 "circle.bmp"
+.sprite 0 125 175 "circle.bmp"
 
-.sprite 1 250 170 "circle.bmp"
+.sprite 1 225 170 "circle.bmp"
 
 .state 0
+.call 0
 .transition 1
 .end
 

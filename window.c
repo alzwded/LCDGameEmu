@@ -1,4 +1,6 @@
 #include "window.h"
+#include "vector.h"
+#include "log.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -12,8 +14,46 @@ typedef struct {
     char* assets_path;
     SDL_Surface* bg;
     SDL_Surface* display;
+    vector_t* sprites;
+    vector_t* imgs;
     // TODO other sdl stuff
 } window_data_t;
+
+typedef struct {
+    unsigned x, y;
+    SDL_Surface* img;
+} sdl_sprite_t;
+
+typedef struct {
+    char const* name;
+    SDL_Surface* img;
+} sdl_charimg_t;
+int sdl_charimg_sortf(void const* a, void const* b) {
+    sdl_charimg_t* left = (sdl_charimg_t*)a;
+    sdl_charimg_t* right = (sdl_charimg_t*)b;
+    return strcmp(left->name, right->name);
+}
+int sdl_charimg_findf(void const* a, void const* b) {
+    char* left = (char*)a;
+    sdl_charimg_t* right = (sdl_charimg_t*)b;
+    return strcmp(left, right->name);
+}
+
+static sdl_sprite_t* new_sdl_sprite(unsigned x, unsigned y, SDL_Surface* img)
+{
+    sdl_sprite_t* ret = (sdl_sprite_t*)malloc(sizeof(sdl_sprite_t));
+    ret->x = x;
+    ret->y = y;
+    ret->img = img;
+    return ret;
+}
+
+static void delete_sdl_sprite(sdl_sprite_t** this)
+{
+    if(!*this) return;
+    free(*this);
+    *this = NULL;
+}
 
 static void _window_viewer_impl_nudge(struct viewer_s* this, void* source)
 {
@@ -30,6 +70,34 @@ static viewer_t* new_window_viewer_impl(window_t* parent)
     ret->_data = parent;
     ret->nudge = &_window_viewer_impl_nudge;
     return ret;
+}
+
+static void _window_clear_sprites(struct window_s* this)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
+    size_t len = data->sprites->size(data->sprites);
+    size_t i = 0;
+    for(; i < len; ++i) {
+        sdl_sprite_t* sprite = (sdl_sprite_t*)data->sprites->get(data->sprites, i);
+        delete_sdl_sprite(&sprite);
+    }
+    delete_vector(&data->sprites);
+}
+
+static void _window_clear_imgs(struct window_s* this)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
+    size_t l = data->imgs->size(data->imgs);
+    size_t i = 0;
+    for(; i < l; ++i) {
+        sdl_charimg_t* s = (sdl_charimg_t*)data->imgs->get(data->imgs, i);
+        SDL_FreeSurface(s->img);
+    }
+    delete_vector(&data->imgs);
 }
 
 static unsigned _window_init(struct window_s* this, char const* path)
@@ -83,7 +151,44 @@ static unsigned _window_init(struct window_s* this, char const* path)
     }
 
     // load sprites
-    // TODO
+    if(data->imgs) _window_clear_imgs(this);
+    if(data->sprites) _window_clear_sprites(this);
+    data->sprites = new_vector();
+    data->imgs = new_vector();
+    /* nothing */
+    {
+        size_t l = data->machine->game->nsprites;
+        size_t i = 0;
+        for(; i < l; ++i) {
+            sprite_t* sprite = data->machine->game->sprites[i];
+            sdl_charimg_t* found = data->imgs->find(data->imgs, sprite->path, sdl_charimg_findf);
+            if(found) {
+                data->sprites->append(data->sprites,
+                        (void const*)new_sdl_sprite(
+                            sprite->x,
+                            sprite->y,
+                            found->img));
+            } else {
+                sdl_charimg_t* img = (sdl_charimg_t*)malloc(sizeof(sdl_charimg_t));
+                char* fullPath = (char*)malloc(strlen(data->assets_path) + strlen(sprite->path));
+                img->name = sprite->path;
+                strcpy(fullPath, data->assets_path);
+                strcat(fullPath, sprite->path);
+                img->img = SDL_LoadBMP(fullPath);
+
+                data->imgs->append(data->imgs, (void const*)img);
+                data->imgs->sort(data->imgs, sdl_charimg_sortf);
+
+                free(fullPath);
+
+                data->sprites->append(data->sprites,
+                        new_sdl_sprite(
+                            sprite->x,
+                            sprite->y,
+                            img->img));
+            }
+        }
+    }
 
     // open window
     if(!data->display) {
@@ -103,7 +208,7 @@ static unsigned _window_init(struct window_s* this, char const* path)
 
 static SDLCALL Uint32 _window_ontimer(Uint32 interval)
 {
-    g_tick = 1;
+    ++g_tick;
     return interval;
 }
 
@@ -139,16 +244,44 @@ static void _window_redraw(struct window_s* this)
 {
     assert(this);
     window_data_t* data = (window_data_t*)this->_data;
+    size_t l = 0, i = 0;
     assert(data);
     // -- redraw logic
     // clrscr()
+    // draw bg
 
     SDL_BlitSurface(data->bg, NULL, data->display, NULL);
-    SDL_UpdateRect(data->display, 0, 0, 0, 0);
 
-    // draw bg
     // foreach active sprite
     //    render it
+    /* nothing */
+    {
+        vector_t* sprites = new_vector();
+        data->machine->get_active_sprites(data->machine, sprites);
+        for(l = sprites->size(sprites), i = 0;
+                i < l; ++i)
+        {
+            unsigned idx = (unsigned)sprites->get(sprites, i);
+            sdl_sprite_t* sprite = (sdl_sprite_t*)data->sprites->get(data->sprites, idx);
+            unsigned x = sprite->x;
+            unsigned y = sprite->y;
+            SDL_Surface* img = sprite->img;
+            unsigned w = img->w;
+            unsigned h = img->h;
+            SDL_Rect rect = { x, y, w, h };
+
+            if(SDL_SetColorKey(img, SDL_SRCCOLORKEY, SDL_MapRGB(img->format, 255, 0, 255)) < 0) {
+                jaklog(ERROR, 0, "Something bad happened:");
+                jaklog(ERROR, JAK_LN, SDL_GetError());
+                abort();
+            }
+
+            SDL_BlitSurface(img, NULL, data->display, &rect);
+        }
+        delete_vector(&sprites);
+    }
+
+    SDL_UpdateRect(data->display, 0, 0, 0, 0);
 }
 
 static viewer_t* _window_get_viewer(struct window_s* this)
@@ -188,6 +321,8 @@ void delete_window(window_t** this)
     if(data->assets_path) free(data->assets_path);
     if(data->bg) SDL_FreeSurface(data->bg);
     if(data->display) SDL_Quit();
+
+    // FIXME sprites, imgs, etc memory leak right now
 
     // TODO other de-init stuff
 

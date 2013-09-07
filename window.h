@@ -13,7 +13,7 @@ typedef enum {
 typedef struct window_s {
     void* _data;
 
-    window_init_err_code_t (*init)(struct window_s*, char const*);
+    window_init_err_code_t (*init)(struct window_s*, char const*, unsigned char);
     void (*loop)(struct window_s*);
     void (*redraw)(struct window_s*);
     viewer_t* (*get_viewer)(struct window_s*);

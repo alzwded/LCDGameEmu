@@ -67,7 +67,7 @@ void init()
     g_machine = new_machine(THEGAME);
     if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
     g_window = new_window(g_machine);
-    g_window->init(g_window, fileName);
+    g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL);
     g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
     // TODO init gui
 }
@@ -148,7 +148,7 @@ void ProcessWhatJustHasHappened()
 
 int main(int argc, char* argv[])
 {
-    jaklog_set_level(DEBUG);
+    jaklog_set_level(INFO);
 
     HandleParameters(argc, argv);
     ProcessWhatJustHasHappened();

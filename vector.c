@@ -139,6 +139,8 @@ vector_t* new_vector_of(size_t initialCapacity)
     ret->set = _vector_set_impl;
     ret->get = _vector_get_impl;
     ret->array = _vector_array_impl;
+    ret->sort = &_vector_sort_impl;
+    ret->find = &_vector_find_impl;
 
     return ret;
 }

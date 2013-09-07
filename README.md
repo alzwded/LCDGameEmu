@@ -21,7 +21,7 @@ TODO
 * ~~sprite graph state machine~~ done
 * ~~storage format~~ done
 * ~~loader~~ done
-* controls (scripted input done, ongoing)
+* controls (scripted input done, keyboard input done but hardcoded, ongoing)
 * cmd line switch to set the clock cycle time
 * rewrite cmdargs.c HandleParameters since it's of a lesser quality than I remember
 

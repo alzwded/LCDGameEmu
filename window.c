@@ -16,8 +16,66 @@ typedef struct {
     SDL_Surface* display;
     vector_t* sprites;
     vector_t* imgs;
+    unsigned char send_input;
+    vector_t* input_mapping;
     // TODO other sdl stuff
 } window_data_t;
+
+typedef struct {
+    char const* name;
+    unsigned keysym;
+    unsigned inputbit;
+} input_mapping_pair_t;
+static int _input_mapping_pair_by_keysym(void const* a, void const* b)
+{
+    input_mapping_pair_t** left = (input_mapping_pair_t**)a;
+    input_mapping_pair_t** right = (input_mapping_pair_t**)b;
+    jaklog(DEBUG, JAK_STR, "bykeysym comparing: ");
+    jaklog(DEBUG, JAK_NUM, &(*left)->keysym);
+    jaklog(DEBUG, JAK_STR, " and ");
+    jaklog(DEBUG, JAK_NUM|JAK_LN, &(*right)->keysym);
+    return (*left)->keysym - (*right)->keysym;
+}
+static int _input_mapping_pair_by_name(void const* a, void const* b)
+{
+    input_mapping_pair_t** left = (input_mapping_pair_t**)a;
+    input_mapping_pair_t** right = (input_mapping_pair_t**)b;
+    return strcmp((*left)->name, (*right)->name);
+}
+static int _input_mapping_pair_find_keysym(void const* key, void const* b)
+{
+    unsigned* left = (unsigned*)key;
+    input_mapping_pair_t** right = (input_mapping_pair_t**)b;
+    jaklog(DEBUG, JAK_STR, "comparing: ");
+    jaklog(DEBUG, JAK_NUM, key);
+    jaklog(DEBUG, JAK_STR, " and ");
+    jaklog(DEBUG, JAK_NUM|JAK_LN, &(*right)->keysym);
+    return *left - (*right)->keysym;
+}
+static input_mapping_pair_t _window_key_mapping[] = {
+    { "left", SDLK_LEFT, LEFT },
+    { "right", SDLK_RIGHT, RIGHT },
+    { "up", SDLK_UP, UP },
+    { "down", SDLK_DOWN, DOWN },
+    { "fire", SDLK_1, FIRE },
+    { "alt", SDLK_2, ALT },
+    { "start", SDLK_9, START },
+    { "toggle", SDLK_0, TOGGLE },
+    { "upleft", SDLK_q, UPLEFT },
+    { "upright", SDLK_p, UPRIGHT },
+    { "downleft", SDLK_a, DOWNLEFT },
+    { "downright", SDLK_l, DOWNRIGHT }
+};
+static void _window_init_input_mapping(vector_t** this)
+{
+    size_t i = 0;
+    input_mapping_pair_t* p = &_window_key_mapping[0];
+    *this = new_vector_of(12);
+    for(; i < 12; ++i, ++p) {
+        (*this)->set(*this, i, p);
+    }
+    (*this)->sort(*this, _input_mapping_pair_by_keysym);
+}
 
 typedef struct {
     unsigned x, y;
@@ -29,14 +87,14 @@ typedef struct {
     SDL_Surface* img;
 } sdl_charimg_t;
 int sdl_charimg_sortf(void const* a, void const* b) {
-    sdl_charimg_t* left = (sdl_charimg_t*)a;
-    sdl_charimg_t* right = (sdl_charimg_t*)b;
-    return strcmp(left->name, right->name);
+    sdl_charimg_t** left = (sdl_charimg_t**)a;
+    sdl_charimg_t** right = (sdl_charimg_t**)b;
+    return strcmp((*left)->name, (*right)->name);
 }
 int sdl_charimg_findf(void const* a, void const* b) {
     char* left = (char*)a;
-    sdl_charimg_t* right = (sdl_charimg_t*)b;
-    return strcmp(left, right->name);
+    sdl_charimg_t** right = (sdl_charimg_t**)b;
+    return strcmp(left, (*right)->name);
 }
 
 static sdl_sprite_t* new_sdl_sprite(unsigned x, unsigned y, SDL_Surface* img)
@@ -100,11 +158,13 @@ static void _window_clear_imgs(struct window_s* this)
     delete_vector(&data->imgs);
 }
 
-static unsigned _window_init(struct window_s* this, char const* path)
+static unsigned _window_init(struct window_s* this, char const* path, unsigned char send_input)
 {
     assert(this);
     window_data_t* data = (window_data_t*)this->_data;
     assert(data);
+
+    data->send_input = send_input;
 
     // init SDL
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_TIMER) < 0) {
@@ -219,6 +279,7 @@ static void _window_loop(struct window_s* this)
     SDL_Event event;
     char loop = 1;
     unsigned char tick = g_tick;
+    input_bit_field_t current_input = 0x0;
     assert(data);
 
     // set up a timer and start it
@@ -228,14 +289,44 @@ static void _window_loop(struct window_s* this)
         while(SDL_PollEvent(&event)){
             /*check if event type is keyboard press*/
             if(event.type == SDL_KEYDOWN){
+                jaklog(DEBUG, JAK_STR, "received input:");
+                jaklog(DEBUG, JAK_TAB|JAK_LN|JAK_NUM, &event.key.keysym.sym);
                 if(event.key.keysym.sym == SDLK_ESCAPE){
                     loop = 0;
+                } else if(data->send_input) {
+                    input_mapping_pair_t* found =
+                        (input_mapping_pair_t*)
+                        data->input_mapping->find(
+                                data->input_mapping,
+                                &event.key.keysym.sym,
+                                _input_mapping_pair_find_keysym);
+                    if(found) {
+                        jaklog(DEBUG, JAK_STR, "handled with");
+                        jaklog(DEBUG, JAK_TAB|JAK_LN|JAK_NUM, &found->inputbit);
+
+                        current_input |= found->inputbit;
+                    } else {
+                        jaklog(DEBUG, JAK_LN|JAK_STR, "unhandled");
+                    }
                 }
             }
         }
+
+        // poll clock tick
         if(tick != g_tick) {
             tick = g_tick;
+            if(data->send_input) {
+                if(current_input) {
+                    char s[80];
+                    jaklog(INFO, JAK_STR, "sending input: ");
+                    sprintf(s, "%03X", current_input);
+                    jaklog(INFO, JAK_TAB|JAK_STR|JAK_LN, s);
+                }
+                data->machine->set_input_mask(data->machine, ALL_INPUT_BITS ^ current_input, LO);
+                data->machine->set_input_mask(data->machine, current_input, HI);
+            }
             data->machine->onclock(data->machine);
+            current_input = 0x0;
         }
     }
 }
@@ -303,6 +394,9 @@ window_t* new_window(machine_t* machine)
     data->assets_path = NULL;
     data->bg = NULL;
     data->display = NULL;
+    data->send_input = 0;
+
+    _window_init_input_mapping(&data->input_mapping);
 
     ret->init = &_window_init;
     ret->loop = &_window_loop;
@@ -321,10 +415,24 @@ void delete_window(window_t** this)
     if(data->assets_path) free(data->assets_path);
     if(data->bg) SDL_FreeSurface(data->bg);
     if(data->display) SDL_Quit();
-
-    // FIXME sprites, imgs, etc memory leak right now
-
-    // TODO other de-init stuff
+    if(data->input_mapping) delete_vector(&data->input_mapping);
+    if(data->imgs) {
+        size_t l = data->imgs->size(data->imgs), i = 0;
+        for(; i < l; ++i) {
+            sdl_charimg_t* thing = (sdl_charimg_t*)data->imgs->get(data->imgs, i);
+            SDL_FreeSurface(thing->img);
+            free(thing);
+        }
+        delete_vector(&data->imgs);
+    }
+    if(data->sprites) {
+        size_t l = data->sprites->size(data->sprites), i = 0;
+        for(; i < l; ++i) {
+            sdl_sprite_t* thing = (sdl_sprite_t*)data->sprites->get(data->sprites, i);
+            free(thing);
+        }
+        delete_vector(&data->imgs);
+    }
 
     free(data->viewer);
     free(data);

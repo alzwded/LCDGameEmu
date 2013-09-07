@@ -7,6 +7,7 @@
 typedef struct {
     machine_t* machine;
     viewer_t* viewer;
+    char* assets_path;
     // TODO other sdl stuff
 } window_data_t;
 
@@ -29,8 +30,40 @@ static viewer_t* new_window_viewer_impl(window_t* parent)
 
 static unsigned _window_init(struct window_s* this, char const* path)
 {
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
     // init SDL
+    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0) {
+        return WINDOW_ERR_SDL_INIT;
+    }
+
     // get game.assets path
+    if(data->assets_path) free(data->assets_path);
+    /* nothing */
+    {
+        size_t pathlen = strlen(path);
+        char const* p = path + pathlen - 1;
+        if(p < path) return WINDOW_ERR_INVALID_PATH;
+        while(p >= path && *p != '.' && *p != '/') --p;
+        if(p >= path && *p == '.') {
+            // .assets/
+            size_t l = p - path + 8;
+            data->assets_path = (char*)malloc(sizeof(char) * l);
+            strncpy(data->assets_path, path, p - path);
+            strcpy(data->assets_path + (p - path), ".assets/");
+            data->assets_path[l] = '\0';
+        } else if((p >= path && *p == '/') || p < path) {
+            size_t l = pathlen + 8;
+            data->assets_path = (char*)malloc(sizeof(char) * l);
+            strcpy(data->assets_path, path);
+            strcpy(data->assets_path + l, ".assets/");
+            data->assets_path[l] = '\0';
+        } else {
+            return WINDOW_ERR_INVALID_PATH;
+        }
+    }
+
     // load bg.{bmp|png|jpg}
     // load sprites
     // open window
@@ -59,6 +92,7 @@ window_t* new_window(machine_t* machine)
     ret->_data = data;
     data->machine = machine;
     data->viewer = new_window_viewer_impl(ret);
+    data->assets_path = NULL;
 
     ret->init = &_window_init;
     ret->loop = &_window_loop;
@@ -72,6 +106,8 @@ void delete_window(window_t** this)
     if(!*this) return;
 
     window_data_t* data = (*this)->_data;
+
+    if(data->assets_path) free(data->assets_path);
 
     // TODO other de-init stuff
 

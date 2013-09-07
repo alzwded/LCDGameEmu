@@ -6,6 +6,7 @@
 struct _vector_data {
     void** data;
     size_t capacity, size;
+    unsigned char sorted;
 };
 
 static size_t _vector_size_impl(struct vector_s* this)
@@ -90,9 +91,10 @@ static void _vector_sort_impl(struct vector_s* this, comp_func_t func)
     assert(data);
     assert(data->data);
     qsort(data->data, data->size, sizeof(void*), func);
+    data->sorted = 1;
 }
 
-static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func_t func)
+static void* _vector_bsearch_impl(struct vector_s* this, void const* key, comp_func_t func)
 {
     assert(this);
     struct _vector_data* data = (struct _vector_data*)this->_data;
@@ -103,6 +105,23 @@ static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func
     else return *found;
 }
 
+static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func_t func)
+{
+    assert(this);
+    struct _vector_data* d = (struct _vector_data*)this->_data;
+    assert(d);
+    if(d->sorted) return this->bsearch(this, key, func);
+    else {
+        size_t i = 0;
+        for(; i < d->size; ++i) {
+            if(func(key, d->data + i) == 0) {
+                return (void*)(d->data + i);
+            }
+        }
+        return NULL;
+    }
+}
+
 vector_t* new_vector()
 {
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
@@ -110,6 +129,7 @@ vector_t* new_vector()
     d->capacity = 2;
     d->size = 0;
     d->data = (void**)malloc(sizeof(void*) * 2);
+    d->sorted = 0;
     ret->_data = d;
 
     ret->size = &_vector_size_impl;
@@ -119,6 +139,7 @@ vector_t* new_vector()
     ret->get = &_vector_get_impl;
     ret->array = &_vector_array_impl;
     ret->sort = &_vector_sort_impl;
+    ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
 
     return ret;
@@ -129,6 +150,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
     struct _vector_data* d = (struct _vector_data*)malloc(sizeof(struct _vector_data));
     ret->_data = d;
+    d->sorted = 0;
     d->capacity = d->size = initialCapacity;
     d->data = (void**)malloc(sizeof(void*) * initialCapacity);
     memset(d->data, 0, initialCapacity);
@@ -140,6 +162,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     ret->get = _vector_get_impl;
     ret->array = _vector_array_impl;
     ret->sort = &_vector_sort_impl;
+    ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
 
     return ret;

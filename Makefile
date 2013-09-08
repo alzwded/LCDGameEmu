@@ -26,7 +26,7 @@ clean:
 
 all: clean $(EXE)
 
-delivery: lcdgameemu
+delivery: $(EXE)
 	mkdir -p $(TMP)/LCDGameEmu-$(VERSION)
 	rm -rf $(TMP)/LCDGameEmu-$(VERSION)/*
 	tar cv . -X tar.excludes | tar xv -C $(TMP)/LCDGameEmu-$(VERSION)

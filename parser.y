@@ -47,7 +47,7 @@ VAR : '$' INT | '$' IDENT ;*/
 %type <macro> macro
 %type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition call_statement
 
-%error-verbose
+/*%error-verbose*/
 /* define the token table to help the lexer */
 %token_table
 

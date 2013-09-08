@@ -1,0 +1,40 @@
+VERSION = 0.5-win32
+LGEVERSION = '"'$(VERSION)'"'
+YACC = bison
+YACCOPTS = 
+MAINOBJ = main.o
+EXE = lcdgameemu
+OBJS = parser.o code.o log.o cmdargs.o machine.o vector.o \
+	stack.o interpreter.o window.o console_viewer.o inputbit_impl.o
+CC = gcc
+COPTS = -v -c -I. -ISDL-1.2.15 -Wall -DLGEVERSION=$(LGEVERSION)  -D_GNU_SOURCE=1 -DREENTRANT
+LD = gcc
+LDOPTS = -LSDL-1.2.15\lib\x86 -lSDL
+TMP = /tmp
+
+$(EXE): $(MAINOBJ) $(OBJS)
+	$(LD) -o $(EXE) $(MAINOBJ) $(OBJS) $(LDOPTS)
+
+%.o: %.c
+	$(CC) $(COPTS) -o $@ $<
+
+parser.c: parser.y
+	$(YACC)  -o parser.c  $(YACCOPTS) -- parser.y
+
+clean:
+	rm -rf parser.dot parser.output parser.c *.o $(EXE) trace log lcdgameemu.log lcdgameemu.trace delivery/
+
+all: clean $(EXE)
+
+delivery: lcdgameemu
+	mkdir -p $(TMP)/LCDGameEmu-$(VERSION)
+	rm -rf $(TMP)/LCDGameEmu-$(VERSION)/*
+	tar cv . -X tar.excludes | tar xv -C $(TMP)/LCDGameEmu-$(VERSION)
+	mkdir -p delivery
+	tar cvjf delivery/LCDGameEmu-$(VERSION).tbz -C $(TMP) LCDGameEmu-$(VERSION)
+	#tar cv -C $(TMP) LCDGameEmu-$(VERSION).tbz | tar xv -C delivery/
+	rm -rf $(TMP)/LCDGameEmu-$(VERSION) #$(TMP)/LCDGameEmu-$(VERSION).tbz
+
+.PHONY: clean
+.PHONY: all
+.PHONY: delivery

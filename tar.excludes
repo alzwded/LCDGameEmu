@@ -1,0 +1,10 @@
+*.o
+parser.c
+trace
+*.trace
+log
+*.log
+*.dot
+*.output
+.git
+.gitignore

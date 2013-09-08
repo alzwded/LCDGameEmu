@@ -212,3 +212,35 @@ In more detail:
 * the console viewer prints the status of the machine at frame #N, the input that was active during that frame and the sprites active after that frame, as well as the state of the registers after the frame
 * If you want to push multiple buttons, just add two separate entries for the same frame, e.g.: `...,42:left,42:fire,43:up,...`
 * you can imagine that using this input simulator and a real thing might prove problematic, so I guess I should add a flag to disable all other possible viewers or something weird like that :-/
+
+Building on windows
+===================
+
+You'll need a decent C compiler like mingw-gcc, make, bison and the SDL 1.2.15 library with the development headers.
+
+How I do it
+-----------
+
+If you want to know how I build for windows, here's a list:
+
+1. Grab a working version of MinGW and install it and add the bin directory to your PATH system variable.
+2. Also, grab bison from the GnuWin32 project. That one should add itself to PATH.
+3. Grab the SDL 1.2.15 vc development package and dump it in the project's root. The one I'd gotten had the include files dumped in its include directory, so if that's your case, rename the `include` sub-directory to `SDL`
+4. Then, go to the project's root directory and do a `mingw32-make -f Makefile.win32`. The makefile's different because the pkg-config doesn't exist on windows from my knowledge, and bison doesn't support some switches which generate stuff that's really only useful for debugging and fanciness. Mostly fanciness.
+5. To run it, you need SDL.dll in your PATH somewhere. The easiest method to get it running is to copy it next to lcdgameemu.exe
+
+Protip
+------
+
+Installing cygwin with gcc, buildutils, make, bison and sdl is probably a better idea. I didn't do that because cygwin has a really weird license when it comes to distributing stuff built with it, which I don't understand too well. But it's okay if you grab cygwin and build the project yourself.
+
+If you're going to do it on cygwin, then a simple `make` with the default `Makefile` will suffice.
+
+Other compilers
+---------------
+
+Theoretically, you can build this with any somewhat modern day C compiler that's heard of C99. I think the only problem is, really, the `assert()` calls, but those errors should be silenced by adding a stub `assert.h` header to the project and putting `#define assert() /* NULL */` in it.
+
+But it's likely that without a `make` compatible utility, you'd need to define a new project file. It's up to you. The code's pretty much standard C where the only C99 thing I'm aware of using are the `assert()`'s before variable deffinitions. But judging from the errors/warnings gcc in std C mode gives me when I use C99 features, those asserts are probably conformant. Don't quote me on that one.
+
+Well, good luck to you if you plan to build this potato on windows. Let me know how it works out for you!

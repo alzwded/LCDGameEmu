@@ -26,6 +26,7 @@ static const Option Options[] = {
     { "test", 't', FILE_NOT_FOUND, "run debug test [opt N times]", &args_test },
     { "console-viewer", 'C', NO, "enable console viewer", &args_console_viewer_enable },
     { "input", 'i', YES, "input the console viewer will send; format is <frame>:<button>[,<frame>:<button>]*", &args_input },
+    { "remap-keys", '\0', YES, "remap input; format is <name>:<keysym>[,<name>:<keysym>]*; the keysym's are taken from SDL_keysym.h", &args_remap_keys },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
 };
 

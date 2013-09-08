@@ -14,12 +14,14 @@ struct _MAIN_ARGS_s {
     int console_viewer:1;
     vector_t* input;
     unsigned g_test;
+    vector_t* keymap;
 };
 
 struct _MAIN_ARGS_s g_MAIN_ARGS_INST = {
     0, // console_viewer
     NULL, // input
-    0 // g_test
+    0, // g_test
+    NULL // keymap
 };
 
 game_t* THEGAME;
@@ -68,6 +70,7 @@ void init()
     if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
     g_window = new_window(g_machine);
     g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL);
+    if(g_MAIN_ARGS_INST.keymap) g_window->set_keys(g_window, g_MAIN_ARGS_INST.keymap);
     g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
     // TODO init gui
 }
@@ -139,6 +142,29 @@ void args_input(char const* S)
     free(s);
 }
 
+void args_remap_keys(char const* S)
+{
+    char* s = strdup(S);
+    char* p = strtok(s, ",");
+    g_MAIN_ARGS_INST.keymap = new_vector();
+    while(p) {
+        char* colon = strchr(p, ':');
+        key_map_pair_t* el = (key_map_pair_t*)malloc(sizeof(key_map_pair_t));
+
+        if(!colon) abort();
+        *colon = '\0';
+
+        el->name = (char*)malloc(colon - p);
+        strcpy(el->name, p);
+        el->keysym = atoi(colon + 1);
+
+        g_MAIN_ARGS_INST.keymap->append(g_MAIN_ARGS_INST.keymap, el);
+
+        p = strtok(NULL, ",");
+    }
+    free(s);
+}
+
 void ProcessWhatJustHasHappened()
 {
     if(g_MAIN_ARGS_INST.console_viewer) {
@@ -159,6 +185,17 @@ int main(int argc, char* argv[])
 
     delete_console_viewer(&console_viewer);
     delete_vector(&g_MAIN_ARGS_INST.input);
+
+    if(g_MAIN_ARGS_INST.keymap) {
+        size_t l = g_MAIN_ARGS_INST.keymap->size(g_MAIN_ARGS_INST.keymap);
+        size_t i = 0;
+        for(; i < l; ++i) {
+            key_map_pair_t* p = (key_map_pair_t*)g_MAIN_ARGS_INST.keymap->get(g_MAIN_ARGS_INST.keymap, i);
+            free(p->name);
+            free(p);
+        }
+        delete_vector(&g_MAIN_ARGS_INST.keymap);
+    }
 
     return 0;
 }

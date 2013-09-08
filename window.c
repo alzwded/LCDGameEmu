@@ -52,6 +52,12 @@ static int _input_mapping_pair_find_keysym(void const* key, void const* b)
     jaklog(DEBUG, JAK_NUM|JAK_LN, &(*right)->keysym);
     return *left - (*right)->keysym;
 }
+static int _input_mapping_pair_find_name(void const* key, void const* b)
+{
+    char* left = (char*)key;
+    input_mapping_pair_t** right = (input_mapping_pair_t**)b;
+    return strcmp(left, (*right)->name);
+}
 static input_mapping_pair_t _window_key_mapping[] = {
     { "left", SDLK_LEFT, LEFT },
     { "right", SDLK_RIGHT, RIGHT },
@@ -384,6 +390,26 @@ static viewer_t* _window_get_viewer(struct window_s* this)
     return data->viewer;
 }
 
+static int _window_set_keys(struct window_s* this, vector_t* key_map)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    size_t i = 0, l = key_map->size(key_map);
+    data->input_mapping->sort(data->input_mapping, _input_mapping_pair_by_name);
+    for(; i < l; ++i) {
+        key_map_pair_t* km = (key_map_pair_t*)key_map->get(key_map, i);
+        input_mapping_pair_t* im = (input_mapping_pair_t*)data->input_mapping->find(data->input_mapping, km->name, _input_mapping_pair_find_name);
+        if(!im) {
+            jaklog(FATAL, JAK_STR, "no key named ");
+            jaklog(FATAL, JAK_STR|JAK_LN, km->name);
+            return -1;
+        }
+        im->keysym = km->keysym;
+    }
+    data->input_mapping->sort(data->input_mapping, _input_mapping_pair_by_keysym);
+    return 0;
+}
+
 window_t* new_window(machine_t* machine)
 {
     window_t* ret = (window_t*)malloc(sizeof(window_t));
@@ -402,6 +428,7 @@ window_t* new_window(machine_t* machine)
     ret->loop = &_window_loop;
     ret->redraw = &_window_redraw;
     ret->get_viewer = &_window_get_viewer;
+    ret->set_keys = &_window_set_keys;
 
     return ret;
 }

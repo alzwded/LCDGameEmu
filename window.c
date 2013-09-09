@@ -421,6 +421,8 @@ window_t* new_window(machine_t* machine)
     data->bg = NULL;
     data->display = NULL;
     data->send_input = 0;
+    data->imgs = NULL;
+    data->sprites = NULL;
 
     _window_init_input_mapping(&data->input_mapping);
 

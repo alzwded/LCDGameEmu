@@ -1,4 +1,4 @@
-VERSION = 0.5-win32
+VERSION = 0.5.1-win32
 LGEVERSION = '"'$(VERSION)'"'
 YACC = bison
 YACCOPTS = 

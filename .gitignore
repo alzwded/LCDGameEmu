@@ -29,3 +29,5 @@ trace
 lcdgameemu.trace
 log
 lcdgameemu.log
+*.log
+delivery

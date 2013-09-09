@@ -30,6 +30,7 @@ static void _vector_resize_impl(struct vector_s* obj, size_t const new_size)
         memset(&this->data[this->size], 0, new_size - this->size);
     }
     this->size = new_size;
+    this->sorted = 0;
 }
 
 static void _vector_append_impl(struct vector_s* obj, void const* a)
@@ -42,6 +43,7 @@ static void _vector_append_impl(struct vector_s* obj, void const* a)
         this->capacity <<= 1;
     }
     this->data[this->size++] = (void*)a;
+    this->sorted = 0;
 }
 
 static void _vector_set_impl(struct vector_s* obj, size_t const idx, void const* a)
@@ -65,6 +67,7 @@ static void _vector_set_impl(struct vector_s* obj, size_t const idx, void const*
     }
 
     this->data[idx] = (void*)a;
+    this->sorted = 0;
 }
 
 static void* _vector_get_impl(struct vector_s* obj, size_t const idx)
@@ -81,6 +84,7 @@ static void** _vector_array_impl(struct vector_s* obj)
     assert(obj);
     struct _vector_data* this = (struct _vector_data*)obj->_data;
     assert(this);
+    this->sorted = 0;
     return this->data;
 }
 

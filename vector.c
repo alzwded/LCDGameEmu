@@ -88,6 +88,15 @@ static void** _vector_array_impl(struct vector_s* obj)
     return this->data;
 }
 
+static void const** _vector_const_array_impl(struct vector_s* obj)
+{
+    assert(obj);
+    struct _vector_data* this = (struct _vector_data*)obj->_data;
+    assert(this);
+    /* don't touch sorted */
+    return (void const**)this->data;
+}
+
 static void _vector_sort_impl(struct vector_s* this, comp_func_t func)
 {
     assert(this);
@@ -98,7 +107,7 @@ static void _vector_sort_impl(struct vector_s* this, comp_func_t func)
     data->sorted = 1;
 }
 
-static void* _vector_bsearch_impl(struct vector_s* this, void const* key, comp_func_t func)
+static void const** _vector_bsearch_impl(struct vector_s* this, void const* key, comp_func_t func)
 {
     assert(this);
     struct _vector_data* data = (struct _vector_data*)this->_data;
@@ -106,7 +115,7 @@ static void* _vector_bsearch_impl(struct vector_s* this, void const* key, comp_f
     assert(data->data);
     void** found = bsearch(key, data->data, data->size, sizeof(void*), func);
     if(!found) return NULL;
-    else return *found;
+    else return (void const**)found;
 }
 
 static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func_t func)
@@ -114,8 +123,11 @@ static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func
     assert(this);
     struct _vector_data* d = (struct _vector_data*)this->_data;
     assert(d);
-    if(d->sorted) return this->bsearch(this, key, func);
-    else {
+    if(d->sorted) {
+        void const** found = this->bsearch(this, key, func);
+        if(!found) return NULL;
+        else return (void*)(*found);
+    } else {
         size_t i = 0;
         for(; i < d->size; ++i) {
             if(func(key, d->data + i) == 0) {
@@ -142,6 +154,7 @@ vector_t* new_vector()
     ret->set = &_vector_set_impl;
     ret->get = &_vector_get_impl;
     ret->array = &_vector_array_impl;
+    ret->const_array = _vector_const_array_impl;
     ret->sort = &_vector_sort_impl;
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
@@ -165,6 +178,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     ret->set = _vector_set_impl;
     ret->get = _vector_get_impl;
     ret->array = _vector_array_impl;
+    ret->const_array = _vector_const_array_impl;
     ret->sort = &_vector_sort_impl;
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;

@@ -26,6 +26,7 @@ TODO
 * rewrite cmdargs.c HandleParameters since it's of a lesser quality than I remember
 * audio
 * The Great Documentation Effort
+* put the path to the currently loaded game in the titlebar
 
 Testing
 =======

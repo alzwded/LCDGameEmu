@@ -244,3 +244,29 @@ Theoretically, you can build this with any somewhat modern day C compiler that's
 But it's likely that without a `make` compatible utility, you'd need to define a new project file. It's up to you. The code's pretty much standard C where the only C99 thing I'm aware of using are the `assert()`'s before variable deffinitions. But judging from the errors/warnings gcc in std C mode gives me when I use C99 features, those asserts are probably conformant. Don't quote me on that one.
 
 Well, good luck to you if you plan to build this potato on windows. Let me know how it works out for you!
+
+The Great Documentation Effort
+==============================
+
+Code is scarcely documented (i.e. using NoDOC technology). This will need to change.
+
+All headers should have line-by-line comments, since everything in a header should be relevant, otherwise it should not be there.
+
+All .c files hould have a module-wide description and have weird stuff documented for posterity.
+
+All files should have something like a standard header:
+/*
+<license>
+*/
+/* <filename>
+// 
+// <description>
+// 
+// <implementation dependencies, e.g. SDL>
+*/
+
+Static functions should have a minimum of documentation.
+
+Implementation (i.e. defined-in-a-.c-file-) data structs should have the same line-by-line documentation as a header data struct would have. They are essentially the same, but these are probably better to be masked from outside use (for sanity's sake)
+
+The overall architecture should be well documented in a ARCH.md guide or something like that.

@@ -1,7 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef int (*comp_func_t)(void const*, void const*);
 

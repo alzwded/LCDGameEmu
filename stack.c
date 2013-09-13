@@ -1,5 +1,6 @@
 #include "stack.h"
 #include <assert.h>
+#include <stdlib.h>
 
 struct _stack_data {
     struct _stack_data* prev;

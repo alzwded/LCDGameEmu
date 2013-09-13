@@ -1,7 +1,7 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct stack_s {
     void* _data;

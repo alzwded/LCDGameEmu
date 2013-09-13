@@ -1,7 +1,7 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <stdlib.h>
+#include <stddef.h>
 #include "code.h"
 #include "stack.h"
 #include "vector.h"

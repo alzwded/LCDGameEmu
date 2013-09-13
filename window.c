@@ -271,7 +271,11 @@ static unsigned _window_init(struct window_s* this, char const* path, unsigned c
     if(!data->display) {
         unsigned w = data->bg->w;
         unsigned h = data->bg->h;
+        char title[80];
+        extern char const* _GetVersion(void);
+        sprintf(title, "%s-%s", "lcdgameemu", _GetVersion());
         data->display = SDL_SetVideoMode(w, h, 24, SDL_HWSURFACE);
+        SDL_WM_SetCaption(title, title);
     } else {
         fprintf(stderr, "PANIC! don't know what to do if I already have an SDL window :-/\n");
         abort();

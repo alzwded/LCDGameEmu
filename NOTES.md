@@ -190,9 +190,14 @@ Roadmap
 | 0.4-pre    | initial GUI in view mode                              |
 | 0.5        | GUI with input                                        |
 | 0.6        | joystick support, remappable input                    |
-| 0.7        | example game that demoes what this turkey can do      |
+| ~~0.7~~    | ~~example game that demoes what this turkey can do~~  |
 | 0.9        | sound? TBD                                            |
-| 1.0        | gold. Playable pre-bundled game (think DK)            |
+| 1.0        | gold                                                  |
+| 1.1        | Playable pre-bundled game (think DK or EGG)           |
+| 2.0        | nameable sprites, macros and states (ids are annoying)|
+| 3.0        | macros with parameters                                |
+| 4.0        | multiplayer                                           |
+| 5.0        | netplay                                               |
 
 TODO
 ====

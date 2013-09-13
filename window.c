@@ -530,7 +530,7 @@ static void _window_use_joystick(struct window_s* this, int id)
     assert(data->display);
     _window_release_previous_joystick(&data->joystick);
     data->joystickid = id;
-    data->joystick = SDL_JoystickOpen(id);
+    if(id >= 0 && id < SDL_NumJoysticks()) data->joystick = SDL_JoystickOpen(id);
 }
 
 static void _window_init_joystick_mapping(window_data_t* data, vector_t* TBD)

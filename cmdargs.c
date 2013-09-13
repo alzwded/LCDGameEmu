@@ -171,7 +171,7 @@ void PrintHelp(char const* _)
     {
 #define INDENT_VALUE (2 + 15 + 1 + 2 + 1 + 3)
         static int const _indent = INDENT_VALUE;
-        static int const _remainder = 79 - INDENT_VALUE;
+        static int const _remainder = 79 - INDENT_VALUE + 1;
         int lenOfDesc = strlen(p->Description);
         int i;
         printf("--%-15s %c%c   ", p->LongName, (p->ShortName) ? '-' : ' ', (p->ShortName) ? p->ShortName : ' ');
@@ -187,7 +187,7 @@ void PrintHelp(char const* _)
             if(i * _remainder + j < lenOfDesc) {
                 int k;
                 printf("\n");
-                for(k = 0; k < _indent; ++k) printf("%c", ' ');
+                for(k = 1; k < _indent; ++k) printf("%c", ' ');
             }
         }
         printf("\n");

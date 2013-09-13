@@ -23,7 +23,8 @@ parser.c: parser.y
 	$(YACC)  -o parser.c  $(YACCOPTS) -- parser.y
 
 clean:
-	rm -rf parser.dot parser.output parser.c *.o $(EXE) trace log lcdgameemu.log lcdgameemu.trace delivery/
+	clean.bat $(EXE).exe
+	#cmd.exe /C "del /q parser.dot parser.output parser.c *.o $(EXE).exe trace log lcdgameemu.log lcdgameemu.trace delivery/"
 
 all: clean $(EXE)
 

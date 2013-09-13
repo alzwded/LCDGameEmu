@@ -12,5 +12,6 @@ void args_console_viewer_enable(char const*);
 void args_input(char const*);
 void args_remap_keys(char const*);
 void args_list_joysticks(char const*);
+void args_use_nth_joystick(char const*);
 
 #endif

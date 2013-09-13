@@ -18,6 +18,17 @@ typedef struct {
     vector_t* imgs;
     unsigned char send_input;
     vector_t* input_mapping;
+    int joystickid;
+    SDL_Joystick* joystick;
+    struct {
+        int Xaxis;
+        int Yaxis;
+        int hat;
+        int fire;
+        int alt;
+        int start;
+        int toggle;
+    } joystick_mapping;
     // TODO other sdl stuff
 } window_data_t;
 
@@ -284,17 +295,20 @@ static void _window_loop(struct window_s* this)
     window_data_t* data = (window_data_t*)this->_data;
     SDL_Event event;
     char loop = 1;
+    char activateHat = 0;
     unsigned char tick = g_tick;
     input_bit_field_t current_input = 0x0;
+    int xvalue, yvalue;
+    Uint8 hatState;
     assert(data);
 
     // set up a timer and start it
     SDL_SetTimer(100, &_window_ontimer);
 
     while(loop) {
-        while(SDL_PollEvent(&event)){
-            /*check if event type is keyboard press*/
-            if(event.type == SDL_KEYDOWN){
+        while(SDL_PollEvent(&event)) {
+            switch(event.type) {
+            case SDL_KEYDOWN:{
                 jaklog(DEBUG, JAK_STR, "received input:");
                 jaklog(DEBUG, JAK_TAB|JAK_LN|JAK_NUM, &event.key.keysym.sym);
                 if(event.key.keysym.sym == SDLK_ESCAPE){
@@ -315,18 +329,108 @@ static void _window_loop(struct window_s* this)
                         jaklog(DEBUG, JAK_LN|JAK_STR, "unhandled");
                     }
                 }
+                break; }
+            case SDL_JOYAXISMOTION: {
+                if(event.jaxis.which == data->joystickid) {
+                    int value = event.jaxis.value;
+                    int axis = event.jaxis.axis;
+                    jaklog(DEBUG, JAK_STR, "joystick axis input (axis/value)");
+                    jaklog(DEBUG, JAK_TAB|JAK_NUM, &axis);
+                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+                }
+                break; }
+            case SDL_JOYHATMOTION: {
+                if(event.jhat.which == data->joystickid) {
+                    unsigned value = event.jhat.value;
+                    jaklog(DEBUG, JAK_STR, "joystick hat input");
+                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+                }
+                break; }
+            case SDL_JOYBUTTONDOWN: {
+                unsigned which = event.jbutton.which;
+                jaklog(TRACE, JAK_STR, "received input from joystick ");
+                jaklog(TRACE, JAK_NUM|JAK_LN, &which);
+                if(event.jbutton.which == data->joystickid) {
+                    int value = event.jbutton.button;
+                    jaklog(DEBUG, JAK_STR, "joystick button input");
+                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+
+                    if(value == data->joystick_mapping.fire) {
+                        current_input |= FIRE;
+                    } else if(value == data->joystick_mapping.alt) {
+                        current_input |= ALT;
+                    } else if(value == data->joystick_mapping.start) {
+                        current_input |= START;
+                    } else if(value == data->joystick_mapping.toggle) {
+                        current_input |= TOGGLE;
+                    }
+                }
+                break; }
+            }
+        }
+
+        if(data->joystick) {
+            hatState = SDL_JoystickGetHat(data->joystick, data->joystick_mapping.hat);
+            xvalue = SDL_JoystickGetAxis(data->joystick, data->joystick_mapping.Xaxis);
+            yvalue = SDL_JoystickGetAxis(data->joystick, data->joystick_mapping.Yaxis);
+            if(activateHat) {
+                if(hatState == SDL_HAT_CENTERED
+                        && xvalue > -8000 && xvalue < 8000
+                        && yvalue > -8000 && yvalue < 8000)
+                    activateHat = 0;
             }
         }
 
         // poll clock tick
         if(tick != g_tick) {
             tick = g_tick;
+            // TODO query joystick axes and/or hat here
+            if(data->joystick)
+            {
+                if(hatState != SDL_HAT_CENTERED) {
+                    activateHat = 1;
+                    switch(hatState) {
+                    case SDL_HAT_UP: current_input |= UP; break;
+                    case SDL_HAT_DOWN: current_input |= DOWN; break;
+                    case SDL_HAT_LEFT: current_input |= LEFT; break;
+                    case SDL_HAT_RIGHT: current_input |= RIGHT; break;
+                    case SDL_HAT_RIGHTUP: current_input |= UPRIGHT; break;
+                    case SDL_HAT_LEFTUP: current_input |= UPLEFT; break;
+                    case SDL_HAT_RIGHTDOWN: current_input |= DOWNRIGHT; break;
+                    case SDL_HAT_LEFTDOWN: current_input |= DOWNLEFT; break;
+                    }
+                } else if(xvalue < -8000 && yvalue < -8000) {
+                    activateHat = 1;
+                    current_input |= UPLEFT;
+                } else if(xvalue > 8000 && yvalue < -8000) {
+                    activateHat = 1;
+                    current_input |= UPRIGHT;
+                } else if(xvalue < -8000 && yvalue > 8000) {
+                    activateHat = 1;
+                    current_input |= DOWNLEFT;
+                } else if(xvalue > 8000 && yvalue > 8000) {
+                    activateHat = 1;
+                    current_input |= DOWNRIGHT;
+                } else if(xvalue < -8000) {
+                    activateHat = 1;
+                    current_input |= LEFT;
+                } else if(xvalue > 8000) {
+                    activateHat = 1;
+                    current_input |= RIGHT;
+                } else if(yvalue < -8000) {
+                    activateHat = 1;
+                    current_input |= UP;
+                } else if(yvalue > 8000) {
+                    activateHat = 1;
+                    current_input |= DOWN;
+                }
+            }
             if(data->send_input) {
                 if(current_input) {
                     char s[80];
-                    jaklog(INFO, JAK_STR, "sending input: ");
+                    jaklog(DEBUG, JAK_STR, "sending input: ");
                     sprintf(s, "%03X", current_input);
-                    jaklog(INFO, JAK_TAB|JAK_STR|JAK_LN, s);
+                    jaklog(DEBUG, JAK_TAB|JAK_STR|JAK_LN, s);
                 }
                 data->machine->set_input_mask(data->machine, ALL_INPUT_BITS ^ current_input, LO);
                 data->machine->set_input_mask(data->machine, current_input, HI);
@@ -410,6 +514,40 @@ static int _window_set_keys(struct window_s* this, vector_t* key_map)
     return 0;
 }
 
+static void _window_release_previous_joystick(SDL_Joystick** which)
+{
+    assert(which);
+    if(!*which) return;
+    SDL_JoystickClose(*which);
+    *which = NULL;
+}
+
+static void _window_use_joystick(struct window_s* this, int id)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
+    assert(data->display);
+    _window_release_previous_joystick(&data->joystick);
+    data->joystickid = id;
+    data->joystick = SDL_JoystickOpen(id);
+}
+
+static void _window_init_joystick_mapping(window_data_t* data, vector_t* TBD)
+{
+    if(!TBD) {
+        // default mapping
+        data->joystick_mapping.Xaxis = 2;
+        data->joystick_mapping.Yaxis = 3;
+        data->joystick_mapping.hat = 0;
+        data->joystick_mapping.fire = 0;
+        data->joystick_mapping.alt = 1;
+        data->joystick_mapping.start = 9;
+        data->joystick_mapping.toggle = 8;
+    } else {
+    }
+}
+
 window_t* new_window(machine_t* machine)
 {
     window_t* ret = (window_t*)malloc(sizeof(window_t));
@@ -423,14 +561,18 @@ window_t* new_window(machine_t* machine)
     data->send_input = 0;
     data->imgs = NULL;
     data->sprites = NULL;
+    data->joystickid = 0;
+    data->joystick = NULL;
 
     _window_init_input_mapping(&data->input_mapping);
+    _window_init_joystick_mapping(data, NULL);
 
     ret->init = &_window_init;
     ret->loop = &_window_loop;
     ret->redraw = &_window_redraw;
     ret->get_viewer = &_window_get_viewer;
     ret->set_keys = &_window_set_keys;
+    ret->use_joystick = &_window_use_joystick;
 
     return ret;
 }
@@ -443,7 +585,6 @@ void delete_window(window_t** this)
 
     if(data->assets_path) free(data->assets_path);
     if(data->bg) SDL_FreeSurface(data->bg);
-    if(data->display) SDL_Quit();
     if(data->input_mapping) delete_vector(&data->input_mapping);
     if(data->imgs) {
         size_t l = data->imgs->size(data->imgs), i = 0;
@@ -462,9 +603,13 @@ void delete_window(window_t** this)
         }
         delete_vector(&data->imgs);
     }
+    _window_release_previous_joystick(&data->joystick);
 
+    // do this last for SDL stuff
+    if(data->display) SDL_Quit();
     free(data->viewer);
     free(data);
+
     free(*this);
     *this = NULL;
 }

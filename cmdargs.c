@@ -28,6 +28,7 @@ static const Option Options[] = {
     { "input", 'i', YES, "input the console viewer will send; format is <frame>:<button>[,<frame>:<button>]*", &args_input },
     { "remap-keys", '\0', YES, "remap input; format is <name>:<keysym>[,<name>:<keysym>]*; the keysym's are taken from SDL_keysym.h", &args_remap_keys },
     { "list-joysticks", '\0', NO, "list detected joysticks", &args_list_joysticks },
+    { "use-joystick", '\0', YES, "use Nth joystick (instead of first available)", &args_use_nth_joystick },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL },
 };
 

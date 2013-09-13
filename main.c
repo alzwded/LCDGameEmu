@@ -15,13 +15,15 @@ struct _MAIN_ARGS_s {
     vector_t* input;
     unsigned g_test;
     vector_t* keymap;
+    int which_joystick;
 };
 
 struct _MAIN_ARGS_s g_MAIN_ARGS_INST = {
     0, // console_viewer
     NULL, // input
     0, // g_test
-    NULL // keymap
+    NULL, // keymap
+    0, // which_joystick
 };
 
 game_t* THEGAME;
@@ -71,6 +73,7 @@ void init()
     g_window = new_window(g_machine);
     g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL);
     if(g_MAIN_ARGS_INST.keymap) g_window->set_keys(g_window, g_MAIN_ARGS_INST.keymap);
+    g_window->use_joystick(g_window, g_MAIN_ARGS_INST.which_joystick);
     g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
     // TODO init gui
 }
@@ -93,6 +96,11 @@ void test()
     init();
     start();
     cleanup();
+}
+
+void args_use_nth_joystick(char const* S)
+{
+    g_MAIN_ARGS_INST.which_joystick = atoi(S);
 }
 
 void args_console_viewer_enable(char const* _)

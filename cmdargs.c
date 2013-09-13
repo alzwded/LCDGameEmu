@@ -27,7 +27,8 @@ static const Option Options[] = {
     { "console-viewer", 'C', NO, "enable console viewer", &args_console_viewer_enable },
     { "input", 'i', YES, "input the console viewer will send; format is <frame>:<button>[,<frame>:<button>]*", &args_input },
     { "remap-keys", '\0', YES, "remap input; format is <name>:<keysym>[,<name>:<keysym>]*; the keysym's are taken from SDL_keysym.h", &args_remap_keys },
-    { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL }
+    { "list-joysticks", '\0', NO, "list detected joysticks", &args_list_joysticks },
+    { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL },
 };
 
 void HandleParameters(int argc, char* argv[])

@@ -1,11 +1,12 @@
-VERSION = 0.5.1-win32
+VERSION = 0.5.9-win32
 LGEVERSION = '"'$(VERSION)'"'
 YACC = bison
 YACCOPTS = 
 MAINOBJ = main.o
 EXE = lcdgameemu
 OBJS = parser.o code.o log.o cmdargs.o machine.o vector.o \
-	stack.o interpreter.o window.o console_viewer.o inputbit_impl.o
+	stack.o interpreter.o window.o console_viewer.o inputbit_impl.o \
+    cmdargs_impl.o
 CC = gcc
 COPTS = -v -c -I. -ISDL-1.2.15 -Wall -DLGEVERSION=$(LGEVERSION)  -D_GNU_SOURCE=1 -DREENTRANT
 LD = gcc

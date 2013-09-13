@@ -21,7 +21,7 @@ TODO
 * ~~sprite graph state machine~~ done
 * ~~storage format~~ done
 * ~~loader~~ done
-* controls (joystick input left, everything else done)
+* controls (almost done, ability to remap joystick hats/axes/buttons left)
 * cmd line switch to set the clock cycle time
 * rewrite cmdargs.c HandleParameters since it's of a lesser quality than I remember
 * audio

@@ -16,7 +16,7 @@ void args_list_joysticks(char const* _)
         int i = 0, num = SDL_NumJoysticks();
         printf("%d joystick%s detected\n", num, (num != 1) ? "s" : "");
         for(; i < num; ++i) {
-            printf("%3d. %s\n", i + 1, SDL_JoystickName(i));
+            printf("%3d. %s\n", i, SDL_JoystickName(i));
         }
     }
 

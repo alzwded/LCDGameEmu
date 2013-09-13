@@ -37,9 +37,9 @@ loads the test game. This game doesn't actually do anything.
 
 You can code your own little games in LGEScript since the engine is pretty much stable.
 
-The console viewer and automated input can be useful in debugging your own little games. You can activate these with --console-viewer and --input=<frame>:key,...
+The console viewer and automated input can be useful in debugging your own little games. You can activate these with `--console-viewer` and `--input=<frame>:key,...`
 
-There's also the --test=N parameter which runs a certain number of cycles and then exits.
+There's also the `--test=N` parameter which runs a certain number of cycles and then exits.
 
 Have fun!
 

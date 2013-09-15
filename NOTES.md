@@ -275,3 +275,85 @@ Static functions should have a minimum of documentation.
 Implementation (i.e. defined-in-a-.c-file-) data structs should have the same line-by-line documentation as a header data struct would have. They are essentially the same, but these are probably better to be masked from outside use (for sanity's sake)
 
 The overall architecture should be well documented in a ARCH.md guide or something like that.
+
+Using a joystick/gamepad
+========================
+
+If you are a programmer who's worked with joysticks in SDL before, then it should be easy. If you're not, skip to the next sub-section.
+
+You have `--list-joysticks` which lists the devices SDL detects. Then, `--use-joystick`, `--joystick-use-hat` and `--joystick-x/yaxis` tell the main input loop which device/hat/axis to use for this role. Buttons are remapped like keys, so something like `--joystick-map-buttons=fire:0,alt:1,start:9,toggle:8` where the keys are the (internal) key names and the numbers are the button ids.
+
+Mapping your gamepad like a pro
+-------------------------------
+
+If you aren't a programmer or haven't had any contact with coding for input devices, then these switches probably leave you confused and your gamepad ina non-working state. But fear not, LCDGameEmu's builtin debugging messages will help you figure out what you're doing.
+
+Open up something like notepad and start writing.
+
+### Step1
+
+Figuring out which is your joystick and what to pass to `--use-joystick`. This one's easy, run `lcdgameemu --list-joysticks`. Identify the one you want to use, and note the number in the left column. (e.g. the first one's 0, the 3rd one's 2)
+
+Write in your open text editor (i.e. notepad) `--use-joystick=0` (or the number corresponding to the joystick you want to use, if you have multiple ones connected.
+
+### Step2
+
+Run `lcdgameemu -d2`. The example game should be good enough. Now, pick a button on your controller that you want to use for e.g. FIRE. Now spamm it.
+
+Now look at the console. There should be a lot of output like
+```
+11:47:33 sending input:                     020
+11:47:33 joystick button input              1
+11:47:33 sending input:                     020
+11:47:33 joystick button input              1
+11:47:33 sending input:                     020
+11:47:33 joystick button input              1
+11:47:33 sending input:                     020
+```
+The important part there is "joystick button input.............1". In my case, I kept spamming a button which is identified as "1". So I write it down in my open notepad window as `--joystick-map-buttons=fire:1`.
+
+Repeat for the alt, start and toggle buttons and you should have something like `--joystick-map-buttons=fire:1,alt:0,start:4,toggle:9`.
+
+### Step3
+
+Now it's time for your dpads or analogue sticks. Now, certain non-high-end gamepads behave very oddly, but we'll sort it out.
+
+Basically do the same as for the button mapping, but this time spam your dpad or analogue stick left-to-right. Now, output may vary between:
+
+1)
+```
+11:51:13 joystick axis input (axis/value)   2
++        0
+11:51:13 joystick axis input (axis/value)   2
++        -32768
+11:51:13 joystick axis input (axis/value)   2
++        0
+11:51:13 joystick axis input (axis/value)   2
++        32767
+```
+This means the gamepad's digital d-pad thinks it's an analogue stick. No worries. This output tells you what analogue value the Nth axis is sending. In my case it was axis 2. If I repeat the same spamming processes for "up/down", I'll get axis 3. So update your notepad window with `--joystick-xaxis=2 --joystick-yaxis=3`
+
+2)
+```
+11:51:13 joystick hat input                 0
++        0
+11:51:13 joystick hat input                 0
++        4
+```
+In this case it means the dpad identifies itself as a POV hat. So write down `--joystick-use-hat=0`.
+
+### Putting it all together
+
+Now you can paste everything you're written down together as command line arguments to lcdgameemu. E.g.:
+```
+lcdgameemu --load=my_super_game.lge --use-joystick=1 --joystick-map-buttons=fire:1,alt:0,start:4,toggle:9 --joystick-xaxis=2 --joystick-yaxis=3 --joystick-use-hat=0
+```
+And now your joystick/gamepad should be working.
+
+### Why isn't there a GUI for this?
+
+It's planned for version 19.5 . You can check the current version with
+```
+lcdgameemu --version
+```
+It will probably say something like `lcdgameemu 0.6` or `lcdgameemu 0.6-win32`

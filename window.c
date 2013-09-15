@@ -346,7 +346,9 @@ static void _window_loop(struct window_s* this)
             case SDL_JOYHATMOTION: {
                 if(event.jhat.which == data->joystickid) {
                     unsigned value = event.jhat.value;
+                    int hat = event.jhat.hat;
                     jaklog(DEBUG, JAK_STR, "joystick hat input");
+                    jaklog(DEBUG, JAK_TAB|JAK_NUM, &hat);
                     jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
                 }
                 break; }

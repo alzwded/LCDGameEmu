@@ -24,6 +24,8 @@ typedef struct window_s {
     void (*redraw)(struct window_s*);
     viewer_t* (*get_viewer)(struct window_s*);
     void (*use_joystick)(struct window_s*, int);
+    void (*map_joystick)(struct window_s*, vector_t*);
+    void (*set_dpads)(struct window_s*, int, int, int);
 } window_t;
 
 window_t* new_window(machine_t*);

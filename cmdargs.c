@@ -29,6 +29,10 @@ static const Option Options[] = {
     { "remap-keys", '\0', YES, "remap input; format is <name>:<keysym>[,<name>:<keysym>]*; the keysym's are taken from SDL_keysym.h", &args_remap_keys },
     { "list-joysticks", '\0', NO, "list detected joysticks", &args_list_joysticks },
     { "use-joystick", '\0', YES, "use Nth joystick (instead of first available, see output of --list-joysticks)", &args_use_nth_joystick },
+    { "joystick-map-buttons", 'B', YES, "remap joystick/gamepad buttons", &args_joystick_map_buttons },
+    { "joystick-use-hat", 'H', YES, "select which POV hat to use if there are more", &args_joystick_use_hat },
+    { "joystick-xaxis", 'X', YES, "select which axis to use as the x axis", &args_joystick_xaxis },
+    { "joystick-yaxis", 'Y', YES, "select which axis to use as the y axis", &args_joystick_yaxis },
     { NULL, '\0', FILE_NOT_FOUND, "NULL terminator", NULL },
 };
 
@@ -174,8 +178,12 @@ void PrintHelp(char const* _)
         static int const _remainder = 79 - INDENT_VALUE + 1;
         int lenOfDesc = strlen(p->Description);
         int i;
-        printf("--%-15s %c%c   ", p->LongName, (p->ShortName) ? '-' : ' ', (p->ShortName) ? p->ShortName : ' ');
-        if(strlen(p->LongName) > 15) printf("\n");
+        printf("--%-16s %c%c  ", p->LongName, (p->ShortName) ? '-' : ' ', (p->ShortName) ? p->ShortName : ' ');
+        if(strlen(p->LongName) > 16) {
+            size_t k = 1;
+            printf("\n");
+            for(; k < _indent; ++k) printf(" ");
+        }
 
         for(i = 0; i < lenOfDesc / _remainder + 1; ++i)
         {

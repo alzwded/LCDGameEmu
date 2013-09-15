@@ -16,6 +16,10 @@ struct _MAIN_ARGS_s {
     unsigned g_test;
     vector_t* keymap;
     int which_joystick;
+    vector_t* joystick_map;
+    int which_hat;
+    int which_xaxis;
+    int which_yaxis;
 };
 
 struct _MAIN_ARGS_s g_MAIN_ARGS_INST = {
@@ -24,6 +28,10 @@ struct _MAIN_ARGS_s g_MAIN_ARGS_INST = {
     0, // g_test
     NULL, // keymap
     0, // which_joystick
+    NULL, // joystick_map
+    0, // which_hat
+    0, // which_xaxis
+    1, // which_yaxis
 };
 
 game_t* THEGAME;
@@ -74,6 +82,8 @@ void init()
     g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL);
     if(g_MAIN_ARGS_INST.keymap) g_window->set_keys(g_window, g_MAIN_ARGS_INST.keymap);
     g_window->use_joystick(g_window, g_MAIN_ARGS_INST.which_joystick);
+    if(g_MAIN_ARGS_INST.joystick_map) g_window->map_joystick(g_window, g_MAIN_ARGS_INST.joystick_map);
+    g_window->set_dpads(g_window, g_MAIN_ARGS_INST.which_hat, g_MAIN_ARGS_INST.which_xaxis, g_MAIN_ARGS_INST.which_yaxis);
     g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
     // TODO init gui
 }
@@ -124,6 +134,21 @@ void args_load(char const* s)
     fileName = s;
 }
 
+void args_joystick_use_hat(char const* s)
+{
+    g_MAIN_ARGS_INST.which_hat = atoi(s);
+}
+
+void args_joystick_xaxis(char const* s)
+{
+    g_MAIN_ARGS_INST.which_xaxis = atoi(s);
+}
+
+void args_joystick_yaxis(char const* s)
+{
+    g_MAIN_ARGS_INST.which_yaxis = atoi(s);
+}
+
 void args_input(char const* S)
 {
     char* s = strdup(S);
@@ -146,6 +171,27 @@ void args_input(char const* S)
         g_MAIN_ARGS_INST.input->append(g_MAIN_ARGS_INST.input, (void const*)el.raw);
 
         p = strtok(NULL, ",");
+    }
+    free(s);
+}
+
+void args_joystick_map_buttons(char const* S)
+{
+    char* s = strdup(S);
+    char* p = strtok(s, ",");
+    g_MAIN_ARGS_INST.joystick_map = new_vector();
+    for(; p; p = strtok(NULL, ",")) {
+        char* colon = strchr(p, ':');
+        key_map_pair_t* el = (key_map_pair_t*)malloc(sizeof(key_map_pair_t));
+
+        if(!colon) abort();
+        *colon = '\0';
+
+        el->name = (char*)malloc(colon - p);
+        strcpy(el->name, p);
+        el->keysym = atoi(colon + 1);
+
+        g_MAIN_ARGS_INST.joystick_map->append(g_MAIN_ARGS_INST.joystick_map, el);
     }
     free(s);
 }
@@ -180,6 +226,22 @@ void ProcessWhatJustHasHappened()
     }
 }
 
+static void clear_keymap(vector_t** this)
+{
+    if(!*this) return;
+    /* else */
+    {
+        size_t l = (*this)->size(*this);
+        size_t i = 0;
+        for(; i < l; ++i) {
+            key_map_pair_t* p = (key_map_pair_t*)(*this)->get(*this, i);
+            free(p->name);
+            free(p);
+        }
+        delete_vector(this);
+    }
+}
+
 int main(int argc, char* argv[])
 {
     jaklog_set_level(INFO);
@@ -193,17 +255,9 @@ int main(int argc, char* argv[])
 
     delete_console_viewer(&console_viewer);
     delete_vector(&g_MAIN_ARGS_INST.input);
+    clear_keymap(&g_MAIN_ARGS_INST.joystick_map);
+    clear_keymap(&g_MAIN_ARGS_INST.keymap);
 
-    if(g_MAIN_ARGS_INST.keymap) {
-        size_t l = g_MAIN_ARGS_INST.keymap->size(g_MAIN_ARGS_INST.keymap);
-        size_t i = 0;
-        for(; i < l; ++i) {
-            key_map_pair_t* p = (key_map_pair_t*)g_MAIN_ARGS_INST.keymap->get(g_MAIN_ARGS_INST.keymap, i);
-            free(p->name);
-            free(p);
-        }
-        delete_vector(&g_MAIN_ARGS_INST.keymap);
-    }
 
     return 0;
 }

@@ -552,6 +552,51 @@ static void _window_init_joystick_mapping(window_data_t* data, vector_t* TBD)
     }
 }
 
+static void _window_map_joystick(struct window_s* this, vector_t* mapping)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
+    assert(mapping);
+    size_t i = 0, l = mapping->size(mapping);
+    for(; i < l; ++i) {
+        key_map_pair_t* km = (key_map_pair_t*)mapping->get(mapping, i);
+        input_bit_t ib = str2inputbit(km->name);
+        if(!ib) {
+            jaklog(FATAL, JAK_STR, "no key named ");
+            jaklog(FATAL, JAK_STR|JAK_LN, km->name);
+            exit(254);
+        }
+        switch(ib) {
+        case FIRE:
+            data->joystick_mapping.fire = km->keysym;
+            continue;
+        case ALT:
+            data->joystick_mapping.alt = km->keysym;
+            continue;
+        case TOGGLE:
+            data->joystick_mapping.toggle = km->keysym;
+            continue;
+        case START:
+            data->joystick_mapping.start = km->keysym;
+            continue;
+        default:
+            jaklog(WARNING, JAK_STR|JAK_LN, "remapping keys other than FIRE, ALT, TOGGLE or START not (yet) supported");
+            continue;
+        }
+    }
+}
+
+static void _window_set_dpads(struct window_s* this, int hat, int xaxis, int yaxis)
+{
+    assert(this);
+    window_data_t* data = (window_data_t*)this->_data;
+    assert(data);
+    data->joystick_mapping.hat = hat;
+    data->joystick_mapping.Xaxis = xaxis;
+    data->joystick_mapping.Yaxis = yaxis;
+}
+
 window_t* new_window(machine_t* machine)
 {
     window_t* ret = (window_t*)malloc(sizeof(window_t));
@@ -577,6 +622,8 @@ window_t* new_window(machine_t* machine)
     ret->get_viewer = &_window_get_viewer;
     ret->set_keys = &_window_set_keys;
     ret->use_joystick = &_window_use_joystick;
+    ret->map_joystick = &_window_map_joystick;
+    ret->set_dpads = &_window_set_dpads;
 
     return ret;
 }

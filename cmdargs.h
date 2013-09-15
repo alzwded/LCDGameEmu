@@ -13,5 +13,9 @@ void args_input(char const*);
 void args_remap_keys(char const*);
 void args_list_joysticks(char const*);
 void args_use_nth_joystick(char const*);
+void args_joystick_map_buttons(char const*);
+void args_joystick_use_hat(char const*);
+void args_joystick_xaxis(char const*);
+void args_joystick_yaxis(char const*);
 
 #endif

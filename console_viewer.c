@@ -65,7 +65,7 @@ static void _console_viewer_nudge(struct viewer_s* this, void* source)
     data->current_frame++;
     if(data->input) {
         void const** foundv = data->input->bsearch(data->input, &data->current_frame, &frame_button_pair_finder);
-        machine->set_input_mask(machine, ALL_INPUT_BITS, LO);
+        machine->set_input_mask(machine, LGE_ALL_INPUT_BITS, bsLO);
 
         if(!foundv) return;
         else {
@@ -77,7 +77,7 @@ static void _console_viewer_nudge(struct viewer_s* this, void* source)
             }
             while(++foundv < end && frame_button_pair_finder(&data->current_frame, foundv) == 0) {
                 frame_button_pair_t* el = (frame_button_pair_t*)foundv;
-                machine->set_input(machine, (*el).button, HI);
+                machine->set_input(machine, (*el).button, bsHI);
             }
         }
     }

@@ -61,8 +61,8 @@ void HandleParameters(int argc, char* argv[])
                                     (p->Callback)(argv[i]);
                                     break;
                                 } else {
-                                    jaklog(FATAL, JAK_STR, "Parameter required for");
-                                    jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, p->LongName);
+                                    jaklog(jlFATAL, jlSTR, "Parameter required for");
+                                    jaklog(jlFATAL, jlTAB|jlSTR|jlLN, p->LongName);
                                     exit(-2);
                                 }
                             } else if(p->HasParameter == NO) {
@@ -90,8 +90,8 @@ void HandleParameters(int argc, char* argv[])
                         } else if(s[2 + lengthLongName] == '=') {
                             param = &s[2 + lengthLongName + 1];
                             if(p->HasParameter == NO) {
-                                jaklog(FATAL, JAK_STR, "Extraneuous parameter for");
-                                jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, p->LongName);
+                                jaklog(jlFATAL, jlSTR, "Extraneuous parameter for");
+                                jaklog(jlFATAL, jlTAB|jlSTR|jlLN, p->LongName);
                                 exit(-2);
                             } else {
                                 if(p->Callback)
@@ -99,8 +99,8 @@ void HandleParameters(int argc, char* argv[])
                                 break;
                             }
                         } else {
-                            jaklog(FATAL, JAK_STR, "Unknown switch");
-                            jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, s);
+                            jaklog(jlFATAL, jlSTR, "Unknown switch");
+                            jaklog(jlFATAL, jlTAB|jlSTR|jlLN, s);
                             exit(-2);
                         }
                     } else {
@@ -111,8 +111,8 @@ void HandleParameters(int argc, char* argv[])
                         if(strlen(s) > 2) {
                             param = s + 2;
                             if(p->HasParameter == NO) {
-                                jaklog(FATAL, JAK_STR, "Extraneuous parameter for");
-                                jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, p->LongName);
+                                jaklog(jlFATAL, jlSTR, "Extraneuous parameter for");
+                                jaklog(jlFATAL, jlTAB|jlSTR|jlLN, p->LongName);
                                 exit(-2);
                             } else {
                                 (p->Callback)(param);
@@ -120,8 +120,8 @@ void HandleParameters(int argc, char* argv[])
                             }
                         } else {
                             if(p->HasParameter == YES) {
-                                jaklog(FATAL, JAK_STR, "Missing parameter for");
-                                jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, p->LongName);
+                                jaklog(jlFATAL, jlSTR, "Missing parameter for");
+                                jaklog(jlFATAL, jlTAB|jlSTR|jlLN, p->LongName);
                                 exit(-2);
                             } else {
                                 (p->Callback)(NULL);
@@ -132,19 +132,19 @@ void HandleParameters(int argc, char* argv[])
                         continue;
                     }
                 } else {
-                    jaklog(FATAL, JAK_STR, "Unknown switch");
-                    jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, s);
+                    jaklog(jlFATAL, jlSTR, "Unknown switch");
+                    jaklog(jlFATAL, jlTAB|jlSTR|jlLN, s);
                     exit(-2);
                 }
             } else {
-                jaklog(FATAL, JAK_STR, "Unknown switch");
-                jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, s);
+                jaklog(jlFATAL, jlSTR, "Unknown switch");
+                jaklog(jlFATAL, jlTAB|jlSTR|jlLN, s);
                 exit(-2);
             }
         }
         if(p->LongName == NULL && p->ShortName == '\0') {
-            jaklog(FATAL, JAK_STR, "Unknown switch");
-            jaklog(FATAL, JAK_TAB|JAK_STR|JAK_LN, s);
+            jaklog(jlFATAL, jlSTR, "Unknown switch");
+            jaklog(jlFATAL, jlTAB|jlSTR|jlLN, s);
             exit(-2);
         }
     }

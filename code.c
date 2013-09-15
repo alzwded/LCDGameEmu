@@ -145,8 +145,8 @@ void delete_code(code_t** code)
 
     if(!code || !*code) return;
 
-    jaklog(TRACE, JAK_STR, "freeing the members of a");
-    jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, strct((*code)->type));
+    jaklog(jlTRACE, jlSTR, "freeing the members of a");
+    jaklog(jlTRACE, jlTAB|jlSTR|jlLN, strct((*code)->type));
 
     delete_code(&(*code)->next);
 
@@ -176,8 +176,8 @@ void delete_code(code_t** code)
     delete_code(left);
     delete_code(right);
 
-    jaklog(TRACE, JAK_STR, "freeing a");
-    jaklog(TRACE, JAK_TAB|JAK_STR|JAK_LN, strct((*code)->type));
+    jaklog(jlTRACE, jlSTR, "freeing a");
+    jaklog(jlTRACE, jlTAB|jlSTR|jlLN, strct((*code)->type));
 
     free(*code);
     *code = NULL;

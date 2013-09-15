@@ -41,10 +41,10 @@ static int _input_mapping_pair_by_keysym(void const* a, void const* b)
 {
     input_mapping_pair_t** left = (input_mapping_pair_t**)a;
     input_mapping_pair_t** right = (input_mapping_pair_t**)b;
-    jaklog(DEBUG, JAK_STR, "bykeysym comparing: ");
-    jaklog(DEBUG, JAK_NUM, &(*left)->keysym);
-    jaklog(DEBUG, JAK_STR, " and ");
-    jaklog(DEBUG, JAK_NUM|JAK_LN, &(*right)->keysym);
+    jaklog(jlDEBUG, jlSTR, "bykeysym comparing: ");
+    jaklog(jlDEBUG, jlNUM, &(*left)->keysym);
+    jaklog(jlDEBUG, jlSTR, " and ");
+    jaklog(jlDEBUG, jlNUM|jlLN, &(*right)->keysym);
     return (*left)->keysym - (*right)->keysym;
 }
 static int _input_mapping_pair_by_name(void const* a, void const* b)
@@ -57,10 +57,10 @@ static int _input_mapping_pair_find_keysym(void const* key, void const* b)
 {
     unsigned* left = (unsigned*)key;
     input_mapping_pair_t** right = (input_mapping_pair_t**)b;
-    jaklog(DEBUG, JAK_STR, "comparing: ");
-    jaklog(DEBUG, JAK_NUM, key);
-    jaklog(DEBUG, JAK_STR, " and ");
-    jaklog(DEBUG, JAK_NUM|JAK_LN, &(*right)->keysym);
+    jaklog(jlDEBUG, jlSTR, "comparing: ");
+    jaklog(jlDEBUG, jlNUM, key);
+    jaklog(jlDEBUG, jlSTR, " and ");
+    jaklog(jlDEBUG, jlNUM|jlLN, &(*right)->keysym);
     return *left - (*right)->keysym;
 }
 static int _input_mapping_pair_find_name(void const* key, void const* b)
@@ -70,18 +70,18 @@ static int _input_mapping_pair_find_name(void const* key, void const* b)
     return strcmp(left, (*right)->name);
 }
 static input_mapping_pair_t _window_key_mapping[] = {
-    { "left", SDLK_LEFT, LEFT },
-    { "right", SDLK_RIGHT, RIGHT },
-    { "up", SDLK_UP, UP },
-    { "down", SDLK_DOWN, DOWN },
-    { "fire", SDLK_1, FIRE },
-    { "alt", SDLK_2, ALT },
-    { "start", SDLK_9, START },
-    { "toggle", SDLK_0, TOGGLE },
-    { "upleft", SDLK_q, UPLEFT },
-    { "upright", SDLK_p, UPRIGHT },
-    { "downleft", SDLK_a, DOWNLEFT },
-    { "downright", SDLK_l, DOWNRIGHT }
+    { "left", SDLK_LEFT, LGE_LEFT },
+    { "right", SDLK_RIGHT, LGE_RIGHT },
+    { "up", SDLK_UP, LGE_UP },
+    { "down", SDLK_DOWN, LGE_DOWN },
+    { "fire", SDLK_1, LGE_FIRE },
+    { "alt", SDLK_2, LGE_ALT },
+    { "start", SDLK_9, LGE_START },
+    { "toggle", SDLK_0, LGE_TOGGLE },
+    { "upleft", SDLK_q, LGE_UPLEFT },
+    { "upright", SDLK_p, LGE_UPRIGHT },
+    { "downleft", SDLK_a, LGE_DOWNLEFT },
+    { "downright", SDLK_l, LGE_DOWNRIGHT }
 };
 static void _window_init_input_mapping(vector_t** this)
 {
@@ -313,8 +313,8 @@ static void _window_loop(struct window_s* this)
         while(SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_KEYDOWN:{
-                jaklog(DEBUG, JAK_STR, "received input:");
-                jaklog(DEBUG, JAK_TAB|JAK_LN|JAK_NUM, &event.key.keysym.sym);
+                jaklog(jlDEBUG, jlSTR, "received input:");
+                jaklog(jlDEBUG, jlTAB|jlLN|jlNUM, &event.key.keysym.sym);
                 if(event.key.keysym.sym == SDLK_ESCAPE){
                     loop = 0;
                 } else if(data->send_input) {
@@ -325,12 +325,12 @@ static void _window_loop(struct window_s* this)
                                 &event.key.keysym.sym,
                                 _input_mapping_pair_find_keysym);
                     if(found) {
-                        jaklog(DEBUG, JAK_STR, "handled with");
-                        jaklog(DEBUG, JAK_TAB|JAK_LN|JAK_NUM, &found->inputbit);
+                        jaklog(jlDEBUG, jlSTR, "handled with");
+                        jaklog(jlDEBUG, jlTAB|jlLN|jlNUM, &found->inputbit);
 
                         current_input |= found->inputbit;
                     } else {
-                        jaklog(DEBUG, JAK_LN|JAK_STR, "unhandled");
+                        jaklog(jlDEBUG, jlLN|jlSTR, "unhandled");
                     }
                 }
                 break; }
@@ -338,37 +338,37 @@ static void _window_loop(struct window_s* this)
                 if(event.jaxis.which == data->joystickid) {
                     int value = event.jaxis.value;
                     int axis = event.jaxis.axis;
-                    jaklog(DEBUG, JAK_STR, "joystick axis input (axis/value)");
-                    jaklog(DEBUG, JAK_TAB|JAK_NUM, &axis);
-                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+                    jaklog(jlDEBUG, jlSTR, "joystick axis input (axis/value)");
+                    jaklog(jlDEBUG, jlTAB|jlNUM, &axis);
+                    jaklog(jlDEBUG, jlTAB|jlNUM|jlLN, &value);
                 }
                 break; }
             case SDL_JOYHATMOTION: {
                 if(event.jhat.which == data->joystickid) {
                     unsigned value = event.jhat.value;
                     int hat = event.jhat.hat;
-                    jaklog(DEBUG, JAK_STR, "joystick hat input");
-                    jaklog(DEBUG, JAK_TAB|JAK_NUM, &hat);
-                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+                    jaklog(jlDEBUG, jlSTR, "joystick hat input");
+                    jaklog(jlDEBUG, jlTAB|jlNUM, &hat);
+                    jaklog(jlDEBUG, jlTAB|jlNUM|jlLN, &value);
                 }
                 break; }
             case SDL_JOYBUTTONDOWN: {
                 unsigned which = event.jbutton.which;
-                jaklog(TRACE, JAK_STR, "received input from joystick ");
-                jaklog(TRACE, JAK_NUM|JAK_LN, &which);
+                jaklog(jlTRACE, jlSTR, "received input from joystick ");
+                jaklog(jlTRACE, jlNUM|jlLN, &which);
                 if(event.jbutton.which == data->joystickid) {
                     int value = event.jbutton.button;
-                    jaklog(DEBUG, JAK_STR, "joystick button input");
-                    jaklog(DEBUG, JAK_TAB|JAK_NUM|JAK_LN, &value);
+                    jaklog(jlDEBUG, jlSTR, "joystick button input");
+                    jaklog(jlDEBUG, jlTAB|jlNUM|jlLN, &value);
 
                     if(value == data->joystick_mapping.fire) {
-                        current_input |= FIRE;
+                        current_input |= LGE_FIRE;
                     } else if(value == data->joystick_mapping.alt) {
-                        current_input |= ALT;
+                        current_input |= LGE_ALT;
                     } else if(value == data->joystick_mapping.start) {
-                        current_input |= START;
+                        current_input |= LGE_START;
                     } else if(value == data->joystick_mapping.toggle) {
-                        current_input |= TOGGLE;
+                        current_input |= LGE_TOGGLE;
                     }
                 }
                 break; }
@@ -396,50 +396,50 @@ static void _window_loop(struct window_s* this)
                 if(hatState != SDL_HAT_CENTERED) {
                     activateHat = 1;
                     switch(hatState) {
-                    case SDL_HAT_UP: current_input |= UP; break;
-                    case SDL_HAT_DOWN: current_input |= DOWN; break;
-                    case SDL_HAT_LEFT: current_input |= LEFT; break;
-                    case SDL_HAT_RIGHT: current_input |= RIGHT; break;
-                    case SDL_HAT_RIGHTUP: current_input |= UPRIGHT; break;
-                    case SDL_HAT_LEFTUP: current_input |= UPLEFT; break;
-                    case SDL_HAT_RIGHTDOWN: current_input |= DOWNRIGHT; break;
-                    case SDL_HAT_LEFTDOWN: current_input |= DOWNLEFT; break;
+                    case SDL_HAT_UP: current_input |= LGE_UP; break;
+                    case SDL_HAT_DOWN: current_input |= LGE_DOWN; break;
+                    case SDL_HAT_LEFT: current_input |= LGE_LEFT; break;
+                    case SDL_HAT_RIGHT: current_input |= LGE_RIGHT; break;
+                    case SDL_HAT_RIGHTUP: current_input |= LGE_UPRIGHT; break;
+                    case SDL_HAT_LEFTUP: current_input |= LGE_UPLEFT; break;
+                    case SDL_HAT_RIGHTDOWN: current_input |= LGE_DOWNRIGHT; break;
+                    case SDL_HAT_LEFTDOWN: current_input |= LGE_DOWNLEFT; break;
                     }
                 } else if(xvalue < -8000 && yvalue < -8000) {
                     activateHat = 1;
-                    current_input |= UPLEFT;
+                    current_input |= LGE_UPLEFT;
                 } else if(xvalue > 8000 && yvalue < -8000) {
                     activateHat = 1;
-                    current_input |= UPRIGHT;
+                    current_input |= LGE_UPRIGHT;
                 } else if(xvalue < -8000 && yvalue > 8000) {
                     activateHat = 1;
-                    current_input |= DOWNLEFT;
+                    current_input |= LGE_DOWNLEFT;
                 } else if(xvalue > 8000 && yvalue > 8000) {
                     activateHat = 1;
-                    current_input |= DOWNRIGHT;
+                    current_input |= LGE_DOWNRIGHT;
                 } else if(xvalue < -8000) {
                     activateHat = 1;
-                    current_input |= LEFT;
+                    current_input |= LGE_LEFT;
                 } else if(xvalue > 8000) {
                     activateHat = 1;
-                    current_input |= RIGHT;
+                    current_input |= LGE_RIGHT;
                 } else if(yvalue < -8000) {
                     activateHat = 1;
-                    current_input |= UP;
+                    current_input |= LGE_UP;
                 } else if(yvalue > 8000) {
                     activateHat = 1;
-                    current_input |= DOWN;
+                    current_input |= LGE_DOWN;
                 }
             }
             if(data->send_input) {
                 if(current_input) {
                     char s[80];
-                    jaklog(DEBUG, JAK_STR, "sending input: ");
+                    jaklog(jlDEBUG, jlSTR, "sending input: ");
                     sprintf(s, "%03X", current_input);
-                    jaklog(DEBUG, JAK_TAB|JAK_STR|JAK_LN, s);
+                    jaklog(jlDEBUG, jlTAB|jlSTR|jlLN, s);
                 }
-                data->machine->set_input_mask(data->machine, ALL_INPUT_BITS ^ current_input, LO);
-                data->machine->set_input_mask(data->machine, current_input, HI);
+                data->machine->set_input_mask(data->machine, LGE_ALL_INPUT_BITS ^ current_input, bsLO);
+                data->machine->set_input_mask(data->machine, current_input, bsHI);
             }
             data->machine->onclock(data->machine);
             current_input = 0x0;
@@ -478,8 +478,8 @@ static void _window_redraw(struct window_s* this)
             SDL_Rect rect = { x, y, w, h };
 
             if(SDL_SetColorKey(img, SDL_SRCCOLORKEY, SDL_MapRGB(img->format, 255, 0, 255)) < 0) {
-                jaklog(ERROR, 0, "Something bad happened:");
-                jaklog(ERROR, JAK_LN, SDL_GetError());
+                jaklog(jlDEBUG, 0, "Something bad happened:");
+                jaklog(jlDEBUG, jlLN, SDL_GetError());
                 abort();
             }
 
@@ -510,8 +510,8 @@ static int _window_set_keys(struct window_s* this, vector_t* key_map)
         key_map_pair_t* km = (key_map_pair_t*)key_map->get(key_map, i);
         input_mapping_pair_t* im = (input_mapping_pair_t*)data->input_mapping->find(data->input_mapping, km->name, _input_mapping_pair_find_name);
         if(!im) {
-            jaklog(FATAL, JAK_STR, "no key named ");
-            jaklog(FATAL, JAK_STR|JAK_LN, km->name);
+            jaklog(jlFATAL, jlSTR, "no key named ");
+            jaklog(jlFATAL, jlSTR|jlLN, km->name);
             return -1;
         }
         im->keysym = km->keysym;
@@ -565,25 +565,25 @@ static void _window_map_joystick(struct window_s* this, vector_t* mapping)
         key_map_pair_t* km = (key_map_pair_t*)mapping->get(mapping, i);
         input_bit_t ib = str2inputbit(km->name);
         if(!ib) {
-            jaklog(FATAL, JAK_STR, "no key named ");
-            jaklog(FATAL, JAK_STR|JAK_LN, km->name);
+            jaklog(jlFATAL, jlSTR, "no key named ");
+            jaklog(jlFATAL, jlSTR|jlLN, km->name);
             exit(254);
         }
         switch(ib) {
-        case FIRE:
+        case LGE_FIRE:
             data->joystick_mapping.fire = km->keysym;
             continue;
-        case ALT:
+        case LGE_ALT:
             data->joystick_mapping.alt = km->keysym;
             continue;
-        case TOGGLE:
+        case LGE_TOGGLE:
             data->joystick_mapping.toggle = km->keysym;
             continue;
-        case START:
+        case LGE_START:
             data->joystick_mapping.start = km->keysym;
             continue;
         default:
-            jaklog(WARNING, JAK_STR|JAK_LN, "remapping keys other than FIRE, ALT, TOGGLE or START not (yet) supported");
+            jaklog(jlWARNING, jlSTR|jlLN, "remapping keys other than LGE_FIRE, LGE_ALT, LGE_TOGGLE or LGE_START not (yet) supported");
             continue;
         }
     }

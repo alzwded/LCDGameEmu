@@ -78,19 +78,40 @@ void init()
 {
     g_machine = new_machine(THEGAME);
     if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
+
     g_window = new_window(g_machine);
-    g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL);
-    if(g_MAIN_ARGS_INST.keymap) g_window->set_keys(g_window, g_MAIN_ARGS_INST.keymap);
+    switch(g_window->init(g_window, fileName, g_MAIN_ARGS_INST.input == NULL)) {
+    case WINDOW_ERR_SDL_INIT:
+        jaklog(jlFATAL, jlSTR|jlLN, "could not init SDL");
+        exit(42);
+    case WINDOW_ERR_INVALID_PATH:
+        jaklog(jlFATAL, jlSTR|jlLN, "failed to load window because of an invalid path");
+        exit(42);
+    case WINDOW_ERR_NO_BG:
+        jaklog(jlFATAL, jlSTR|jlLN, "no background provided");
+        exit(42);
+    default:
+        jaklog(jlFATAL, jlSTR|jlLN, "unknown error while initializing main window");
+        exit(42);
+    case WINDOW_ERR_SUCCESS: /* NOTHING */
+        break;
+    }
+
+    if(g_MAIN_ARGS_INST.keymap) 
+        if(g_window->set_keys(g_window, g_MAIN_ARGS_INST.keymap)) {
+            jaklog(jlFATAL, jlSTR|jlLN, "there was an error remapping the keys. Check input");
+            exit(42);
+        }
+
     g_window->use_joystick(g_window, g_MAIN_ARGS_INST.which_joystick);
     if(g_MAIN_ARGS_INST.joystick_map) g_window->map_joystick(g_window, g_MAIN_ARGS_INST.joystick_map);
     g_window->set_dpads(g_window, g_MAIN_ARGS_INST.which_hat, g_MAIN_ARGS_INST.which_xaxis, g_MAIN_ARGS_INST.which_yaxis);
+
     g_machine->add_viewer(g_machine, g_window->get_viewer(g_window));
-    // TODO init gui
 }
 
 void start()
 {
-    // TODO launch timer which calls g_machine->onclock(g_machine)
     if(g_MAIN_ARGS_INST.g_test) {
         int i;
         for(i = 0; i < g_MAIN_ARGS_INST.g_test; ++i)
@@ -244,13 +265,11 @@ static void clear_keymap(vector_t** this)
 
 int main(int argc, char* argv[])
 {
-    jaklog_set_level(INFO);
+    jaklog_set_level(jlINFO);
 
     HandleParameters(argc, argv);
     ProcessWhatJustHasHappened();
 
-    //if(g_MAIN_ARGS_INST.g_test) test();
-    //else test(); // TODO :-P
     test();
 
     delete_console_viewer(&console_viewer);

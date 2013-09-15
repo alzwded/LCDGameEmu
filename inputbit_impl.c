@@ -4,18 +4,18 @@
 #include <assert.h>
 
 static struct _ident_mapping_s _idents[] = {
-    { "alt", ALT },
-    { "down", DOWN },
-    { "downleft", DOWNLEFT },
-    { "downright", DOWNRIGHT },
-    { "fire", FIRE },
-    { "left", LEFT },
-    { "right", RIGHT },
-    { "start", START },
-    { "toggle", TOGGLE },
-    { "up", UP },
-    { "upleft", UPLEFT },
-    { "upright", UPRIGHT },
+    { "alt", LGE_ALT },
+    { "down", LGE_DOWN },
+    { "downleft", LGE_DOWNLEFT },
+    { "downright", LGE_DOWNRIGHT },
+    { "fire", LGE_FIRE },
+    { "left", LGE_LEFT },
+    { "right", LGE_RIGHT },
+    { "start", LGE_START },
+    { "toggle", LGE_TOGGLE },
+    { "up", LGE_UP },
+    { "upleft", LGE_UPLEFT },
+    { "upright", LGE_UPRIGHT },
     { NULL, 0 }
 };
 

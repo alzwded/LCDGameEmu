@@ -56,7 +56,7 @@ VAR : '$' INT | '$' IDENT ;*/
 file : /* NULL */ {
         /* this is the first thing that's triggered, so instantiate the
            game structure */
-        jaklog(TRACE, JAK_STR | JAK_LN, "spawning game");
+        jaklog(jlTRACE, jlSTR | jlLN, "spawning game");
         THEGAME = new_game();
         }
      | file item

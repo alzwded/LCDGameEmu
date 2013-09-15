@@ -1,4 +1,4 @@
-VERSION = 0.6
+VERSION = 0.6.1
 LGEVERSION = '"'$(VERSION)'"'
 YACC = bison
 YACCOPTS = --graph -k -v

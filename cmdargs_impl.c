@@ -8,7 +8,7 @@ void args_list_joysticks(char const* _)
     extern char const* _GetVersion(void);
     printf("lcdgameemu %s\n", _GetVersion());
     if(0 > SDL_Init(SDL_INIT_JOYSTICK)) {
-        jaklog(FATAL, JAK_STR|JAK_LN, "failed to initialize SDL");
+        jaklog(jlFATAL, jlSTR|jlLN, "failed to initialize SDL");
         exit(255);
     }
 

@@ -38,8 +38,8 @@ static void _machine_onclock_impl(struct machine_s* this)
 static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, input_bit_state_t state)
 {
     assert(this);
-    assert(state == HI || state == LO);
-    assert(bit && bit <= ALL_INPUT_BITS);
+    assert(state == bsHI || state == bsLO);
+    assert(bit && bit <= LGE_ALL_INPUT_BITS);
 
     this->input &= ~bit;
     if(state) this->input |= bit;
@@ -48,8 +48,8 @@ static void _machine_set_input_impl(struct machine_s* this, input_bit_t bit, inp
 static void _machine_set_input_mask_impl(struct machine_s* this, input_bit_field_t mask, input_bit_state_t state)
 {
     assert(this);
-    assert(state == HI || state == LO);
-    assert(mask <= ALL_INPUT_BITS);
+    assert(state == bsHI || state == bsLO);
+    assert(mask <= LGE_ALL_INPUT_BITS);
 
     this->input &= ~mask;
     if(state) this->input |= mask;

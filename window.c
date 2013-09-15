@@ -253,6 +253,18 @@ static unsigned _window_init(struct window_s* this, char const* path, unsigned c
                 strcat(fullPath, sprite->path);
                 img->img = SDL_LoadBMP(fullPath);
 
+                if(!img->img) {
+                    jaklog(jlERROR, jlSTR, "Failed to load bitmap ");
+                    jaklog(jlERROR, jlSTR|jlLN, fullPath);
+                } else if(SDL_SetColorKey(img->img, SDL_SRCCOLORKEY,
+                            SDL_MapRGB(img->img->format, 255, 0, 255))
+                        < 0)
+                {
+                    jaklog(jlDEBUG, 0, "Something bad happened:");
+                    jaklog(jlDEBUG, jlLN, SDL_GetError());
+                    abort();
+                }
+
                 data->imgs->append(data->imgs, (void const*)img);
                 data->imgs->sort(data->imgs, sdl_charimg_sortf);
 
@@ -476,12 +488,6 @@ static void _window_redraw(struct window_s* this)
             unsigned w = img->w;
             unsigned h = img->h;
             SDL_Rect rect = { x, y, w, h };
-
-            if(SDL_SetColorKey(img, SDL_SRCCOLORKEY, SDL_MapRGB(img->format, 255, 0, 255)) < 0) {
-                jaklog(jlDEBUG, 0, "Something bad happened:");
-                jaklog(jlDEBUG, jlLN, SDL_GetError());
-                abort();
-            }
 
             SDL_BlitSurface(img, NULL, data->display, &rect);
         }

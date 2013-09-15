@@ -129,6 +129,11 @@ Have fun!
 Release notes thing
 ===================
 
+0.6
+---
+
+* joystick input
+
 0.5.1
 -----
 

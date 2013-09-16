@@ -175,6 +175,17 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             unsigned retVal = (unsigned)this->stack->pop(this->stack);
             if(retVal) interpreter_eval(this, ip->right.code);
             break; } 
+        case ctTAILIF: {
+            unsigned nextCode = 0;
+            interpreter_eval(this, ip->left.code);
+            unsigned retVal = (unsigned)this->stack->pop(this->stack);
+            if(retVal) {
+                interpreter_eval(this, ip->right.code);
+                nextCode = (unsigned)this->stack->pop(this->stack);
+                ip = _get_code_of_macro(this, nextCode);
+                continue;
+            }
+            break; } 
         case ctEQ: {
             unsigned val = 1;
             unsigned left, right;
@@ -241,6 +252,12 @@ void interpreter_eval(machine_t* this, code_t* beginI)
         case ctCALL: {
             interpreter_eval(this, _get_code_of_macro(this, ip->left.num));
             break; }
+        case ctTAILCALL:
+            ip = _get_code_of_macro(this, ip->left.num);
+            break;
+        case ctTAILCALL2:
+            this->stack->push(this->stack, (void const*)ip->left.num);
+            return;
         }
         INTERPRETER_NEXTI();
     }

@@ -132,6 +132,57 @@ You can call a subroutine with `.call N` where `N` is the macro's id.
 
 These macros don't take parameters since the only form of storage are the 100 registers I've mentioned earlier.
 
+Loops
+-----
+
+Loops are not explicitly part of the grammar.
+
+However, the interpreter supports basic tail-recursion optimization (if you really don't know what that is, check is out on wikipedia).
+
+In a nutshell, this means that if the last instruction in a subroutine is a call to another subroutine (`.macro`'s in LGEScript), there is no need to push the return address onto the stack since the return address will be the same as in the additional call.
+
+This means that a macro with tail recursion will not cause a stack overflow. If you try this trick anywhere else in the body of a `.macro` with a sufficiantly large number of calls, the C stack will overflow and the program will crash.
+
+Here's how to do it:
+```
+.macro 123 # loop
+.call 124 # do some stuff you'd do in a loop
+.if
+    < $99 $98 ; # this condition can be anything. it's here to actually
+                # stop the recursion. This is the 'c' in 'while(c)'
+    .call 123
+.fi
+```
+
+The above code will execute whatever macro 124 does as long as the value in register 99 is greater than the value in register 98. As of lcdgameemu 0.6.2, this will not cause a stack overflow.
+
+Here's how to loop from 0 to 9 (without accomplishing anything):
+```
+.state 14
+.set $0 0
+.set $1 11
+.call 1
+.end
+
+.macro 1
+.set $0 + 1 $0
+.if < $0 $1 ; .call 1 .fi
+```
+
+Here's something else you can do:
+```
+.macro 0
+.if = $56 3 ; .transition 2 .fi # instantly stops interpretation and on the
+                                # next clock, execution will start in state
+                                # 2
+.set $56 .mod * $33 $29 7
+.call 0
+```
+
+Theoretically, trail recursion optimization should kick in even if you daisy chain a number of macros that all have the property of their last instruction being the recursive call. However, be careful, as tail call optimization only kicks in on the very last instruction of a `.macro`.
+
+If you're asking, yes, tail-call loops look better in lisp like languages. But really now, loops do not have their place in what this languages wishes to accomplish. LGEScript should rather describe what switches would be activated on a circuit board and when and what happens when you do that. It doesn't want to be a high-level language.
+
 State transitions
 -----------------
 

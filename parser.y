@@ -22,6 +22,8 @@ int yyerror(char const*);
 extern game_t* THEGAME;
 
 int yylex();
+
+int tail_call(unsigned, code_t*);
 %}
 %union {
     char const* str;
@@ -66,7 +68,11 @@ item : sprite { THEGAME->add_sprite(THEGAME, $1); }
      | macro { THEGAME->add_macro(THEGAME, $1); }
      ;
 
-macro: ".macro" INT code { $$ = new_macro($2, $3); }
+macro: ".macro" INT code
+        {
+            tail_call($2, $3);
+            $$ = new_macro($2, $3);
+        }
 
 sprite : ".sprite" INT INT INT PATH { $$ = new_sprite($2, $3, $4, strdup($5)); } ;
 state : ".state" INT code { $$ = new_state($2, $3); } ;
@@ -393,4 +399,52 @@ int yyerror(char const* s)
     fprintf(stderr, "%s\n", s);
     exit(0);
     return 0;
+}
+
+int tail_call(unsigned id, code_t* code)
+{
+    code_t* p = code;
+    while(p->next) p = p->next;
+    switch(p->type) {
+    case ctNOP: return 0;
+    case ctREGISTER: return 0;
+    case ctIDENT: return 0;
+    case ctRESETALL: return 0;
+    case ctSETVAR: return 0;
+    case ctSETSPRITE: return 0;
+    case ctTRANSITION: return 0;
+    case ctISSPRITE: return 0;
+    case ctISVAR: return 0;
+    case ctCONST: return 0;
+    case ctMUL: return 0;
+    case ctDIV: return 0;
+    case ctMOD: return 0;
+    case ctSUM: return 0;
+    case ctSUB: return 0;
+    case ctEQ: return 0;
+    case ctNE: return 0;
+    case ctLT: return 0;
+    case ctGT: return 0;
+    case ctNOT: return 0;
+    case ctRNG: return 0;
+    case ctIF:
+        if(tail_call(id, p->right.code)) {
+            p->type = ctTAILIF;
+        }
+        return 1;
+    case ctCALL:
+        if(p->top && p->top->type == ctIF) {
+            p->type = ctTAILCALL2;
+        } else {
+            p->type = ctTAILCALL;
+        }
+        return 1;
+    case ctTAILCALL: return 1;
+    case ctTAILCALL2: return 1;
+    default: {
+        unsigned t = p->type;
+        jaklog(jlERROR, jlSTR, "unknown instruction type ");
+        jaklog(jlERROR, jlTAB|jlNUM|jlLN, &t);
+        return 0; }
+    }
 }

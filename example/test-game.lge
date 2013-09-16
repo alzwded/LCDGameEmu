@@ -7,7 +7,26 @@
 
 .sprite 1 225 170 "circle.bmp"
 
+.macro 666
+.set $99 - $99 1
+.if = $99 0 ; .set $98 - $98 1 .fi
+.if = $98 0 ; .set $97 - $97 1 .fi
+.if = $97 0 ; .set $96 - $96 1 .fi
+.if = $96 0 ; .set $95 - $95 1 .fi
+.if = $95 0 ; .set $94 - $94 1 .fi
+.if > $99 0 & > $98 0 & > $97 0 & > $96 0 & > $95 0 & > $94 0 ; .call 666 .fi
+.end
+
 .state 0
+# tail call test
+.set $99 255
+.set $98 255
+.set $97 255
+.set $96 255
+.set $95 255
+.set $94 255
+.call 666
+# end tail call test
 .call 0
 .transition 1
 .end

@@ -21,7 +21,10 @@ typedef enum {
     ctCONST,
     ctMUL, ctDIV, ctMOD, ctSUM, ctSUB,
     ctEQ, ctNE, ctLT, ctGT, ctNOT,
-    ctRNG, ctIF, ctCALL
+    ctRNG, ctIF, ctCALL,
+    ctTAILCALL,
+    ctTAILIF,
+    ctTAILCALL2
 } code_type_t;
 
 typedef enum {

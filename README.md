@@ -129,6 +129,11 @@ Have fun!
 Release notes thing
 ===================
 
+0.6.2
+-----
+
+* basic tail recursion optimization in interpreter
+
 0.6
 ---
 

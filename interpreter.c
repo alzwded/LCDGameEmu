@@ -254,7 +254,7 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             break; }
         case ctTAILCALL:
             ip = _get_code_of_macro(this, ip->left.num);
-            break;
+            continue;
         case ctTAILCALL2:
             this->stack->push(this->stack, (void const*)ip->left.num);
             return;

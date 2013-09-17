@@ -636,7 +636,7 @@ window_t* new_window(machine_t* machine)
     return ret;
 }
 
-static void _window_free_charimg(void const* el)
+static void _window_free_charimg(void* el)
 {
     sdl_charimg_t* thing = (sdl_charimg_t*)el;
     assert(el);
@@ -658,7 +658,7 @@ void delete_window(window_t** this)
         delete_vector(&data->imgs);
     }
     if(data->sprites) {
-        data->sprites->for_each(data->sprites, (vector_for_each_f_t)&free);
+        data->sprites->for_each(data->sprites, &free);
         delete_vector(&data->imgs);
     }
     _window_release_previous_joystick(&data->joystick);

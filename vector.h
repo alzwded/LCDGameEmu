@@ -5,7 +5,7 @@
 
 typedef int (*comp_func_t)(void const*, void const*);
 
-typedef void (*vector_for_each_f_t)(void const*);
+typedef void (*vector_for_each_f_t)(void*);
 
 typedef struct vector_s {
     void* _data;

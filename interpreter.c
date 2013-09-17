@@ -97,7 +97,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             val = (ip->right.num == (unsigned)this->sprite_state->get(this->sprite_state, _get_sprite_index(this, ip->left.num)));
             this->stack->push(this->stack, (void const*)val);
             break; }
@@ -188,16 +191,16 @@ void interpreter_eval(machine_t* this, code_t* beginI)
         case ctTAILIF: {
             unsigned nextCode = 0;
             interpreter_eval(this, ip->left.code);
-            if(ip->top == NULL) {
-                unsigned retVal = (unsigned)this->stack->pop(this->stack);
-                if(retVal) {
-                    interpreter_eval(this, ip->right.code);
+            unsigned retVal = (unsigned)this->stack->pop(this->stack);
+            if(retVal) {
+                interpreter_eval(this, ip->right.code);
+                if(ip->first->top == NULL) {
                     nextCode = (unsigned)this->stack->pop(this->stack);
                     ip = _get_code_of_macro(this, nextCode);
                     continue;
+                } else {
+                    return;
                 }
-            } else {
-                return;
             }
             break; } 
         case ctEQ: {
@@ -206,7 +209,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             interpreter_eval(this, ip->left.code);
             interpreter_eval(this, ip->right.code);
             right = (unsigned)this->stack->pop(this->stack);
@@ -219,7 +225,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             interpreter_eval(this, ip->left.code);
             interpreter_eval(this, ip->right.code);
             right = (unsigned)this->stack->pop(this->stack);
@@ -232,7 +241,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             interpreter_eval(this, ip->left.code);
             interpreter_eval(this, ip->right.code);
             right = (unsigned)this->stack->pop(this->stack);
@@ -245,7 +257,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             interpreter_eval(this, ip->left.code);
             interpreter_eval(this, ip->right.code);
             right = (unsigned)this->stack->pop(this->stack);
@@ -258,7 +273,10 @@ void interpreter_eval(machine_t* this, code_t* beginI)
             if(ip != ip->first) {
                 val = (unsigned)this->stack->pop(this->stack);
             }
-            if(!val) return;
+            if(!val) {
+                this->stack->push(this->stack, (void const*)val);
+                return;
+            }
             interpreter_eval(this, ip->left.code);
             left = (unsigned)this->stack->pop(this->stack);
             this->stack->push(this->stack, (void const*)(val && !left));

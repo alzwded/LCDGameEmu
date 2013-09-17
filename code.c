@@ -318,6 +318,8 @@ code_t* new_binfunc(code_type_t type, code_t* left, code_t* right)
     ret->left.code->top = ret;
     ret->right.code = right->first;
     ret->right.code->top = ret;
+    left->first->top = ret;
+    right->first->top = ret;
     return ret;
 }
 

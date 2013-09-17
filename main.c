@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 #include "code.h"
 #include "log.h"
 #include "cmdargs.h"
@@ -76,6 +77,7 @@ static char const* fileName = "example/test-game.lge";
 
 void init()
 {
+    srand(time(NULL));
     g_machine = new_machine(THEGAME);
     if(console_viewer) g_machine->add_viewer(g_machine, console_viewer);
 

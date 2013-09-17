@@ -244,12 +244,12 @@ You have the following:
 $left $right $up $down $fire $alt $start $toggle $upleft $upright $downleft $downright
 ```
 
+You can only read them with `.set` and `.reset`. They correspond to the physical input.
+
 Comments
 --------
 
 Comments are preceded by a `#`. This has the effect of commenting the line starting from that position onward. Until the next line, that is.
-
-You can only read them with `.set` and `.reset`. They correspond to the physical input.
 
 Syntax highlight
 ================

@@ -183,6 +183,52 @@ Theoretically, trail recursion optimization should kick in even if you daisy cha
 
 If you're asking, yes, tail-call loops look better in lisp like languages. But really now, loops do not have their place in what this languages wishes to accomplish. LGEScript should rather describe what switches would be activated on a circuit board and when and what happens when you do that. It doesn't want to be a high-level language.
 
+Arrays
+------
+
+Well, you don't explicitly have arrays. Since you only have 100 bytes of memory, there would be no point in explicitly defining arrays.
+
+But, to show you how great a guy I am, I have introduced indexed addressing (like in x86 assembly).
+
+You do this using the `.offset` keyword. It takes two operands, the left being the base, the right operand being the index/offset. For example:
+```
+.set $1 3
+.set $0 10
+.set  .offset $0 $1  42 # equivalent to .set 13 42
+.set $2  .offset $0 $1 # equivalent to .set $2 $13
+```
+
+You can combine this with tail recursion loops to loop over an array, e.g.:
+```
+.macro 1                            # loop:
+.set  .offset $0 $1  $1             #   a[i] = i 
+.set $99    + $99  .offset $0 $1    #   sum = sum + a[i]
+.if < $1 $9 ; .call 1 .fi           #   if(i < N) jmp loop;
+.end
+
+.macro 0 # start loop
+.set $0 40 # set base, i.e. a = &register[40];
+.set $1 0 # set index, i.e. i = 0;
+.set $9 10 # set nb of elements, i.e. N = 10;
+.set $99 0 # we will put the elements' sum here, i.e. sum = 0;
+.call 1 # jmp loop;
+.end
+```
+
+If your mind is blown because of tail recursion loops and are shouting "stack overflow", take that back. The interpreter performs some basic tail-call optimization (which means it doesn't push any context on the stack since there are no more instructions after the call and the return address is the same). Some languages can only loop in this way (prolog, scheme, etc).
+
+It takes some getting used to, but if you really want to compare machine code, a C loop `for(i = 0; i < N; ++i) ...` and a scheme loop
+```
+(let loop ((i 0))
+    (if (> i N)
+        '()
+        ( ...
+            (loop(+ i 1)))))
+```
+will yield the same result. Give or take some aggressive optimizations.
+
+`/rant_over`.
+
 State transitions
 -----------------
 

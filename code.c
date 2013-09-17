@@ -133,6 +133,10 @@ char const* strct(code_type_t type)
     TYPE_TO_STRING(ctRNG);
     TYPE_TO_STRING(ctIF);
     TYPE_TO_STRING(ctCALL);
+    TYPE_TO_STRING(ctTAILIF);
+    TYPE_TO_STRING(ctTAILCALL);
+    TYPE_TO_STRING(ctTAILCALL2);
+    TYPE_TO_STRING(ctOFFSET);
     }
 #undef TYPE_TO_STRING
     return "";
@@ -336,5 +340,14 @@ code_t* new_call(unsigned id)
     code_t* ret = new_nop();
     ret->type = ctCALL;
     ret->left.num = id;
+    return ret;
+}
+
+code_t* new_offset(code_t* left, code_t* right)
+{
+    code_t* ret = new_nop();
+    ret->type = ctOFFSET;
+    ret->left.code = left;
+    ret->right.code = right;
     return ret;
 }

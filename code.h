@@ -24,7 +24,8 @@ typedef enum {
     ctRNG, ctIF, ctCALL,
     ctTAILCALL,
     ctTAILIF,
-    ctTAILCALL2
+    ctTAILCALL2,
+    ctOFFSET,
 } code_type_t;
 
 typedef enum {
@@ -103,6 +104,7 @@ code_t* new_rng(unsigned);
 code_t* new_if(code_t*, code_t*);
 code_t* new_call(unsigned);
 code_t* new_not(code_t*);
+code_t* new_offset(code_t*, code_t*);
 void normalize_code(code_t**);
 
 // set the stream the lexer uses

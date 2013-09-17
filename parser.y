@@ -47,7 +47,7 @@ VAR : '$' INT | '$' IDENT ;*/
 %type <sprite> sprite
 %type <state> state
 %type <macro> macro
-%type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition call_statement
+%type <code> code codes block statement set_statement conditional_statement transition_statement nop isset_expression arithmetic_expression operand VAR equality_expression rng_expression atomic_condition condition call_statement offset_expression offset_atom set_atom_var
 
 /*%error-verbose*/
 /* define the token table to help the lexer */
@@ -120,13 +120,46 @@ call_statement : ".call" INT { $$ = new_call($2); } ;
 
 nop : ".nop" { $$ = new_nop(); } ;
 
+offset_atom : REG
+        {
+            $$ = new_reg($1);
+        }
+            | offset_expression
+        {
+            $$ = $1->first;
+        }
+            | arithmetic_expression
+        {
+            $$ = $1->first;
+        }
+            ;
+
+offset_expression : ".offset" offset_atom offset_atom 
+        {
+            assert($2);
+            assert($3);
+            $$ = new_offset($2->first, $3->first);
+        }
+                  ;
+
 /* VAR : '$' INT | '$' IDENT ; actually processed in lexer */
 VAR : REG { $$ = new_reg($1); }
     | IDENT { $$ = new_ident($1); }
+    | offset_expression { $$ = $1; }
     ;
+
+set_atom_var : REG { $$ = new_reg($1); }
+             | offset_expression { $$ = $1->first; }
+             | arithmetic_expression { $$ = $1->first; }
+
 set_statement : ".set" INT { $$ = new_set_sprite($2, ssON); }
               | ".reset" INT { $$ = new_set_sprite($2, ssOFF); }
-              | ".set" REG arithmetic_expression { $$ = new_set_var(new_const($2), $3); }
+              | ".set" REG set_atom_var { $$ = new_set_var(new_const($2), $3); }
+              | ".set" offset_expression set_atom_var
+        {
+            $2->first->type = ctSUM;
+            $$ = new_set_var($2->first, $3->first);
+        }
               | ".reset" ".all" { $$ = new_reset_all(); }
               ;
 transition_statement : ".transition" INT { $$ = new_transition($2); }

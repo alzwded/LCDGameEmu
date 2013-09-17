@@ -5,7 +5,8 @@
 :setlocal iskeyword+=%
 :syntax case match
 
-:syntax keyword lgescript_kw .set .reset .transition .sum .sub .mod .mul .div .nop .call .all
+:syntax keyword lgescript_kw_special .offset .all
+:syntax keyword lgescript_kw .set .reset .transition .sum .sub .mod .mul .div .nop .call
 :syntax keyword lgescript_section .sprite .state .macro .sound .end
 
 :syntax match lgescript_ident /\<\$[a-zA-Z0-9_]*\>/  contains=lgrscript_num
@@ -33,6 +34,7 @@
 :highlight link lgescript_operator Operator
 :highlight link lgescript_rng Operator
 :highlight link lgescript_if Structure
+:highlight link lgescript_kw_special Structure
 :highlight link lgescript_ifblock Structure
 :highlight link lgescript_if_sep Structure
 :highlight link lgescript_path String

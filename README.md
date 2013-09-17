@@ -129,10 +129,17 @@ Have fun!
 Release notes thing
 ===================
 
+0.6.3
+-----
+
+* add indexed addressing for registers. Syntax is `.offset <base> <index>`, where base can be a register (accessed directly or with another offset) and index is an arithmetic expression;
+* updated the vim syntax file
+* update lge_guide.md
+
 0.6.2
 -----
 
-* basic tail recursion optimization in interpreter
+* basic tail ~~recursion~~ call optimization in interpreter
 
 0.6
 ---

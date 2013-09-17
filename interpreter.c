@@ -104,6 +104,16 @@ void interpreter_eval(machine_t* this, code_t* beginI)
         case ctCONST:
             this->stack->push(this->stack, (void const*)ip->left.num);
             break;
+        case ctOFFSET: {
+            /**/;
+            unsigned left, right, val;
+            interpreter_eval(this, ip->left.code);
+            interpreter_eval(this, ip->right.code);
+            right = (unsigned)this->stack->pop(this->stack);
+            left = (unsigned)this->stack->pop(this->stack);
+            val = this->registers[(left + right) % 100];
+            this->stack->push(this->stack, (void const*)val);
+            break; }
         case ctMUL: {
             unsigned left;
             unsigned right;

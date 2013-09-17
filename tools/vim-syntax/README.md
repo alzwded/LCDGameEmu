@@ -10,3 +10,8 @@ You should also set up a hook in your vimrc file to trigger lgescript syntax hig
 autocmd BufNewFile,BufRead *.lge setlocal syntax=lgescript
 ```
 in your `~/.vimrc` file.
+
+Changes
+=======
+
+* For LCDGameEmu 0.6.3: add ".offset" keyword, ".offset" and ".all" are collored differently;

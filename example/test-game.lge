@@ -17,7 +17,20 @@
 .if > $99 0 & > $98 0 & > $97 0 & > $96 0 & > $95 0 & > $94 0 ; .call 666 .fi
 .end
 
+.macro 222
+.set .offset 40 $39    + 1 .offset 40 $39 # 40 = a, a[i] = a[i] + 1
+.set $39 + $39 1
+.if < $39 $38 ; .call 222 .fi
+.end
+
 .state 0
+# iteration & offset test
+.set $39 0 #i
+.set $38 10 #n
+.call 222
+.set $39 0
+.call 222
+# end iteration & offset test
 # tail call test
 .set $99 255
 .set $98 255

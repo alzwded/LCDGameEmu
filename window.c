@@ -636,6 +636,14 @@ window_t* new_window(machine_t* machine)
     return ret;
 }
 
+static void _window_free_charimg(void const* el)
+{
+    sdl_charimg_t* thing = (sdl_charimg_t*)el;
+    assert(el);
+    SDL_FreeSurface(thing->img);
+    free(thing);
+}
+
 void delete_window(window_t** this)
 {
     if(!*this) return;
@@ -646,20 +654,11 @@ void delete_window(window_t** this)
     if(data->bg) SDL_FreeSurface(data->bg);
     if(data->input_mapping) delete_vector(&data->input_mapping);
     if(data->imgs) {
-        size_t l = data->imgs->size(data->imgs), i = 0;
-        for(; i < l; ++i) {
-            sdl_charimg_t* thing = (sdl_charimg_t*)data->imgs->get(data->imgs, i);
-            SDL_FreeSurface(thing->img);
-            free(thing);
-        }
+        data->imgs->for_each(data->imgs, &_window_free_charimg);
         delete_vector(&data->imgs);
     }
     if(data->sprites) {
-        size_t l = data->sprites->size(data->sprites), i = 0;
-        for(; i < l; ++i) {
-            sdl_sprite_t* thing = (sdl_sprite_t*)data->sprites->get(data->sprites, i);
-            free(thing);
-        }
+        data->sprites->for_each(data->sprites, (vector_for_each_f_t)&free);
         delete_vector(&data->imgs);
     }
     _window_release_previous_joystick(&data->joystick);

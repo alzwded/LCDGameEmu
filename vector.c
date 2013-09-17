@@ -152,6 +152,16 @@ static void _vector_shrink_impl(struct vector_s* this)
     }
 }
 
+static void _vector_for_each_impl(struct vector_s* this, vector_for_each_f_t func)
+{
+    assert(this);
+    assert(func);
+    size_t i = 0;
+    struct _vector_data* data = (struct _vector_data*)this->_data;
+    size_t l = data->size;
+    for(; i < l; func(data->data[i++]));
+}
+
 vector_t* new_vector()
 {
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
@@ -173,6 +183,7 @@ vector_t* new_vector()
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
     ret->shrink = &_vector_shrink_impl;
+    ret->for_each = &_vector_for_each_impl;
 
     return ret;
 }
@@ -198,6 +209,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
     ret->shrink = &_vector_shrink_impl;
+    ret->for_each = &_vector_for_each_impl;
 
     return ret;
 }

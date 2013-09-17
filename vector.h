@@ -5,6 +5,8 @@
 
 typedef int (*comp_func_t)(void const*, void const*);
 
+typedef void (*vector_for_each_f_t)(void const*);
+
 typedef struct vector_s {
     void* _data;
     size_t (*size)(struct vector_s*);
@@ -18,6 +20,7 @@ typedef struct vector_s {
     void const** (*bsearch)(struct vector_s*, void const* key, comp_func_t);
     void* (*find)(struct vector_s*, void const* key, comp_func_t);
     void (*shrink)(struct vector_s*);
+    void (*for_each)(struct vector_s*, vector_for_each_f_t);
 } vector_t;
 
 vector_t* new_vector();

@@ -129,6 +129,11 @@ Have fun!
 Release notes thing
 ===================
 
+0.6.4
+-----
+
+* fix critical bugs (the interpreter was doing all sorts of wrongs)
+
 0.6.3
 -----
 

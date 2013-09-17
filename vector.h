@@ -17,6 +17,7 @@ typedef struct vector_s {
     void (*sort)(struct vector_s*, comp_func_t);
     void const** (*bsearch)(struct vector_s*, void const* key, comp_func_t);
     void* (*find)(struct vector_s*, void const* key, comp_func_t);
+    void (*shrink)(struct vector_s*);
 } vector_t;
 
 vector_t* new_vector();

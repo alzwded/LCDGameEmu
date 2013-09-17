@@ -53,13 +53,16 @@ static void _vector_set_impl(struct vector_s* obj, size_t const idx, void const*
     assert(this);
     if(idx >= this->capacity) {
         this->data = (void**)realloc(this->data, sizeof(void*) * this->capacity << 1);
-        this->capacity <<= 1;
+        while(idx < this->capacity) {
+            this->capacity <<= 1;
+            assert(this->capacity);
+        }
     }
 
     if(idx >= this->size) {
         size_t i;
 
-        for(i = this->size; i < idx; ++i) {
+        for(i = this->size; i > idx; ++i) {
             this->data[i] = NULL;
         }
 
@@ -138,6 +141,17 @@ static void* _vector_find_impl(struct vector_s* this, void const* key, comp_func
     }
 }
 
+static void _vector_shrink_impl(struct vector_s* this)
+{
+    assert(this);
+    struct _vector_data* d = (struct _vector_data*)this->_data;
+    assert(d);
+    if(d->capacity > d->size) {
+        d->data = (void**)realloc(d->data, d->size);
+        d->capacity = d->size;
+    }
+}
+
 vector_t* new_vector()
 {
     vector_t* ret = (vector_t*)malloc(sizeof(vector_t));
@@ -158,6 +172,7 @@ vector_t* new_vector()
     ret->sort = &_vector_sort_impl;
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
+    ret->shrink = &_vector_shrink_impl;
 
     return ret;
 }
@@ -182,6 +197,7 @@ vector_t* new_vector_of(size_t initialCapacity)
     ret->sort = &_vector_sort_impl;
     ret->bsearch = &_vector_bsearch_impl;
     ret->find = &_vector_find_impl;
+    ret->shrink = &_vector_shrink_impl;
 
     return ret;
 }

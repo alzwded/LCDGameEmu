@@ -324,6 +324,9 @@ static void _window_loop(struct window_s* this)
     while(loop) {
         while(SDL_PollEvent(&event)) {
             switch(event.type) {
+            case SDL_QUIT:
+                loop = 0;
+                break;
             case SDL_KEYDOWN:{
                 jaklog(jlDEBUG, jlSTR, "received input:");
                 jaklog(jlDEBUG, jlTAB|jlLN|jlNUM, &event.key.keysym.sym);
